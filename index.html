@@ -639,6 +639,8 @@ function migrate(c){
   (c.subjects||[]).forEach(s=>{ if(!s.level) s.level=c.levels[0]||'Onbekend'; });
   seedTopoEurope(c);
   seedTopoExtras(c);
+  // Topografie (Nederland + Europa) hoort op groep 6 — corrigeer ook eerder opgeslagen data
+  (c.subjects||[]).forEach(s=>{ if(s.id==='topo'||s.id==='topoeu') s.level='Basisschool groep 6'; });
   return c;
 }
 async function init(){
