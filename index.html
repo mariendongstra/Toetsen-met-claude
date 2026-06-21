@@ -249,8 +249,8 @@ function parseMaybe(raw){ if(raw==null)return null; if(typeof raw!=='string')ret
       dat is een bewuste keuze voor eenvoud. Gebruik dit niet voor gevoelige data,
       en maak desgewenst een JSONBin "Access Key" met beperkte rechten i.p.v. de Master Key. */
 const REMOTE={
-  binId:'',   // <-- bijv. '66f0a1c2ad19ca34f8a1b2c3'
-  key:'',     // <-- bijv. '$2a$10$xxxxxxxxxxxxxxxxxxxxxx'  (X-Master-Key of X-Access-Key)
+  binId:'6a382d0ef5f4af5e291950c6',   // <-- bijv. '66f0a1c2ad19ca34f8a1b2c3'
+  key:'$2a$10$GzjAD2bOOWTliN5STX1ZqeLSGlb4UpA6yih4jos.2XdmBdMI2p8..',     // <-- bijv. '$2a$10$xxxxxxxxxxxxxxxxxxxxxx'  (X-Master-Key of X-Access-Key)
   base:'https://api.jsonbin.io/v3/b'
 };
 const remoteOn=()=>!!(REMOTE.binId&&REMOTE.key);
