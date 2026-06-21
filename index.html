@@ -352,7 +352,7 @@ function storageLabel(){
 /* ===================== Voorgeladen data ===================== */
 const DEFAULT_LEVELS=['Basisschool groep 6','Basisschool groep 7','Basisschool groep 8','VWO gymnasium klas 1','VWO gymnasium klas 2'];
 // Verhoog dit nummer telkens als er nieuwe lesstof in de seed bijkomt; opgeslagen data met een lager nummer krijgt een verplichte updatemelding.
-const CONTENT_VERSION=4;
+const CONTENT_VERSION=5;
 function seedContent(){
   const S='gs', T1='§6.1 De Renaissance', T2='§6.2 Het humanisme', T3='§6.3 De ontdekkingsreizen', T4='§6.4 Einde Amerikaanse culturen';
   const Q=(o)=>Object.assign({id:'s'+(Q._n=(Q._n||0)+1), subjectId:S},o);
@@ -373,7 +373,6 @@ function seedContent(){
     students:[],
     subjects:[
       {id:S, name:'Geschiedenis', emoji:'🏛️', sub:'Memo 1B · H6 — Nieuwe ideeën, nieuwe werelden', level:'VWO gymnasium klas 1'},
-      {id:'topo', name:'Topografie Nederland', emoji:'🗺️', sub:'Aardrijkskunde · plaatsen & provincies', level:'Basisschool groep 6'},
       {id:'bio', name:'Biologie', emoji:'🔬', sub:'Biologie voor jou Max · 1B — Thema 5: Waarneming, gedrag en regeling', level:'VWO gymnasium klas 1'},
       {id:'wi', name:'Wiskunde', emoji:'📐', sub:'Getal & Ruimte VWO 1 · FLEX deel 2 — H8 Herleiden en machten', level:'VWO gymnasium klas 1'},
     ],
@@ -807,13 +806,6 @@ function seedContent(){
         answer:'Bij vermenigvuldigen doe je getallen én letters apart: 3·2 = 6 en a·a = a², dus 6a². Bij optellen tel je alleen de getallen op en blijft de letter (a) hetzelfde: 3a + 2a = 5a.'}),
       W({topic:'§8.3 Machten',type:'flash',question:'Inzicht: waarom is (−3)² positief, maar (−3)³ negatief?',
         answer:'(−3)² = (−3)·(−3) = 9: twee minnen vermenigvuldigd geven een plus. (−3)³ = 9·(−3) = −27: bij een oneven aantal minnen blijft het resultaat negatief.'}),
-      // ---- Topografie (voorbeeld; vervang de kaarten via Beheer door je eigen screenshots) ----
-      M({topic:'Provincies',question:'Welke plaats is met de stip aangegeven?',answer:'Utrecht',
-        image:du(mapSVG(135,120,'')), imageLabeled:du(mapSVG(135,120,'Utrecht')),
-        explanation:'Voorbeeldkaart. Vervang via Beheer door je eigen screenshot zonder en met namen.'}),
-      M({topic:'Provincies',question:'Welke plaats is met de stip aangegeven?',answer:'Groningen',
-        image:du(mapSVG(150,55,'')), imageLabeled:du(mapSVG(150,55,'Groningen')),
-        explanation:'Voorbeeldkaart. Vervang via Beheer door je eigen screenshot zonder en met namen.'}),
     ]
   };
 }
@@ -863,7 +855,10 @@ function migrate(c){
   seedTopoEurope(c);
   seedTopoExtras(c);
   // Topografie (Nederland + Europa) hoort op groep 6 — corrigeer ook eerder opgeslagen data
-  (c.subjects||[]).forEach(s=>{ if(s.id==='topo'||s.id==='topoeu') s.level='Basisschool groep 6'; });
+  // Topografie Nederland verwijderen (ook uit oudere browseropslag)
+  c.subjects=(c.subjects||[]).filter(s=>s.id!=='topo');
+  c.questions=(c.questions||[]).filter(q=>q.subjectId!=='topo');
+  (c.subjects||[]).forEach(s=>{ if(s.id==='topoeu') s.level='Basisschool groep 6'; });
   return c;
 }
 async function init(){
