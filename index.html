@@ -287,9 +287,33 @@ async function remoteSet(k,v){
   await remoteWrite(cur); _rcache=cur; _rat=Date.now(); return true;
 }
 
+/* ---- Online opslag licht houden: zware kaartafbeeldingen niet meesturen (zitten al in de app-seed) ---- */
+function stripImages(c){
+  const cl=JSON.parse(JSON.stringify(c));
+  (cl.subjects||[]).forEach(s=>{ delete s.mapImage; delete s.mapImageLabeled; });
+  (cl.questions||[]).forEach(q=>{ delete q.image; delete q.imageLabeled; });
+  return cl;
+}
+let _imgSub=null,_imgQ=null;
+function _buildImgCache(){
+  if(_imgSub) return; _imgSub={}; _imgQ={};
+  try{ const seed=migrate(seedContent());
+    (seed.subjects||[]).forEach(s=>{ if(s.mapImage||s.mapImageLabeled) _imgSub[s.id]={mapImage:s.mapImage,mapImageLabeled:s.mapImageLabeled}; });
+    (seed.questions||[]).forEach(q=>{ if(q.image||q.imageLabeled) _imgQ[q.id]={image:q.image,imageLabeled:q.imageLabeled}; });
+  }catch(e){ console.error('imgcache',e); }
+}
+function rehydrateImages(c){
+  if(!c||typeof c!=='object') return c; _buildImgCache();
+  (c.subjects||[]).forEach(s=>{ const im=_imgSub[s.id]; if(im){ if(!s.mapImage&&im.mapImage)s.mapImage=im.mapImage; if(!s.mapImageLabeled&&im.mapImageLabeled)s.mapImageLabeled=im.mapImageLabeled; } });
+  (c.questions||[]).forEach(q=>{ const im=_imgQ[q.id]; if(im){ if(!q.image&&im.image)q.image=im.image; if(!q.imageLabeled&&im.imageLabeled)q.imageLabeled=im.imageLabeled; } });
+  return c;
+}
+
 async function sget(k,shared=true){
   if(shared && remoteOn()){
-    try{ const all=await remoteAll(); return all[k]!==undefined?all[k]:null; }
+    try{ const all=await remoteAll(); let val=all[k]!==undefined?all[k]:null;
+      if(k===KEYS.content && val) val=rehydrateImages(val); // kaarten lokaal terugzetten
+      return val; }
     catch(e){ console.warn('online opslag onbereikbaar, val terug op lokale kopie',e); state.remoteFailed=true; }
   }
   if(hasStore){ try{const r=await withTimeout(window.storage.get(k,shared),4000); if(r==='__timeout__')return null; return parseMaybe(r?r.value:null);}catch(e){return null;} }
@@ -299,7 +323,8 @@ async function sget(k,shared=true){
 async function sset(k,v,shared=true){
   const s=JSON.stringify(v);
   if(shared && remoteOn() && !state.remoteFailed){
-    try{ await remoteSet(k,v); if(LS){try{localStorage.setItem(k,s);}catch(e){}} return true; }   // online opslaan + lokale kopie als cache
+    try{ const remoteV=(k===KEYS.content)?stripImages(v):v; // zware kaarten niet online opslaan (gratis JSONBin-limiet)
+      await remoteSet(k,remoteV); if(LS){try{localStorage.setItem(k,s);}catch(e){}} return true; }   // online opslaan + lokale kopie (volledig) als cache
     catch(e){ console.warn('online schrijven mislukt',e); state.remoteFailed=true; }
   }
   if(hasStore){ try{const r=await withTimeout(window.storage.set(k,s,shared),4000); return r!=='__timeout__'&&!!r;}catch(e){console.error(e);return false;} }
