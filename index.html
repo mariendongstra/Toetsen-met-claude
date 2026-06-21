@@ -636,6 +636,14 @@ function migrate(c){
   if(!c.students) c.students=[];
   if(!c.adminCode) c.adminCode='1234';
   if(!c.levels.includes('Basisschool groep 6')) c.levels.push('Basisschool groep 6');
+  c.subjects=c.subjects||[]; c.questions=c.questions||[];
+  // Vul ontbrekende vakken/vragen uit de seed aan (ook in oudere browseropslag) — op id, niets wordt overschreven
+  try{ const _seed=seedContent();
+    const _sids=new Set(c.subjects.map(s=>s.id));
+    _seed.subjects.forEach(s=>{ if(!_sids.has(s.id)) c.subjects.push(s); });
+    const _qids=new Set(c.questions.map(q=>q.id));
+    _seed.questions.forEach(q=>{ if(!_qids.has(q.id)) c.questions.push(q); });
+  }catch(_e){ console.error('seed-merge',_e); }
   (c.subjects||[]).forEach(s=>{ if(!s.level) s.level=c.levels[0]||'Onbekend'; });
   seedTopoEurope(c);
   seedTopoExtras(c);
@@ -1235,6 +1243,10 @@ function openDataModal(){
       ${remoteOn()?`<button class="btn btn-line" data-remote-test>Test verbinding</button>
       <button class="btn btn-line" data-remote-pull>Vernieuw vanaf online</button>`:''}
     </div>
+    <div style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px">
+      <div class="subj-meta" style="margin-bottom:8px">Lesstof verversen: haalt de nieuwste vakken en toetsen op uit deze app-versie. Ontbrekende vakken (zoals Biologie, Wiskunde, Topografie) en vragen worden toegevoegd; leerlingen en resultaten blijven behouden.</div>
+      <button class="btn" data-refresh-content>Ververs lesstof (nieuwste toetsen ophalen)</button>
+    </div>
     <div style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px"><button class="lnk" data-reset-attempts>Wis alle sessieresultaten (XP &amp; badges)</button></div>
     </div></div></div>`;
 }
@@ -1294,7 +1306,7 @@ function startTimerDisplay(){ stopTimer(); timerInt=setInterval(()=>{const el=do
 function stopTimer(){ if(timerInt){clearInterval(timerInt);timerInt=null;} }
 
 /* ===================== Events ===================== */
-const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-remote-test','data-remote-pull'];
+const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-remote-test','data-remote-pull'];
 function findAction(start){ let el=start;
   while(el&&el.nodeType===1){ for(const a of ACTION_ATTRS){ if(el.hasAttribute(a)) return el; } el=el.parentElement; }
   return null; }
@@ -1423,6 +1435,13 @@ document.addEventListener('click',async(e)=>{
     }catch(err){ alert('Kon de JSON niet lezen. Controleer of je geldige geëxporteerde data hebt geplakt.'); } return; }
   if(t.hasAttribute('data-reset-attempts')){ if(!confirm('Alle sessieresultaten, XP en badges wissen? Vakken, leerlingen en vragen blijven behouden.'))return;
     attempts=[]; await sset(KEYS.attempts,attempts); closeModal(); render(); return; }
+  if(t.hasAttribute('data-refresh-content')){
+    const before=content.subjects.length+content.questions.length;
+    content=migrate(content); await sset(KEYS.content,content);
+    const added=(content.subjects.length+content.questions.length)-before;
+    closeModal(); render();
+    alert(added>0 ? ('Lesstof ververst ✓ '+added+' nieuwe vakken/vragen toegevoegd.') : 'Lesstof is al up-to-date ✓ Alles staat al klaar.');
+    return; }
   if(t.hasAttribute('data-remote-test')){ if(!remoteOn()){alert('Online opslag is niet ingesteld. Vul REMOTE.binId en REMOTE.key bovenin het bestand in.');return;}
     t.textContent='Bezig…';
     try{ await remoteAll(true); state.remoteFailed=false; alert('Verbinding met de online opslag is gelukt ✓'); }
