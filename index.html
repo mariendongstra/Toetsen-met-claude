@@ -639,8 +639,6 @@ function migrate(c){
   (c.subjects||[]).forEach(s=>{ if(!s.level) s.level=c.levels[0]||'Onbekend'; });
   seedTopoEurope(c);
   seedTopoExtras(c);
-  // Topografie Europa hoort op VWO 1 (was eerder per ongeluk op een basisschoolniveau gezet)
-  (c.subjects||[]).forEach(s=>{ if(s.id==='topoeu' && s.level==='Basisschool groep 6') s.level='VWO gymnasium klas 1'; });
   return c;
 }
 async function init(){
