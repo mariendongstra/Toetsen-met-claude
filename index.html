@@ -977,7 +977,8 @@ function render(){
   let html=v==='login'?viewLogin():v==='dashboard'?viewDashboard():v==='setup'?viewSetup():v==='quiz'?viewQuiz():
            v==='results'?viewResults():v==='badges'?viewBadges():v==='history'?viewHistory():v==='report'?viewReport():v==='manage'?viewManage():'';
   root.innerHTML='<div class="anim">'+html+'</div>';
-  if(v==='quiz'){ startTimerDisplay(); const ta=document.getElementById('typed'); if(ta) ta.focus(); }
+  if(v==='quiz'){ startTimerDisplay(); startQTimer(); const ta=document.getElementById('typed'); if(ta) ta.focus(); }
+  else { clearQTimer(); }
   if(v==='results') drawRing();
 }
 function renderChip(){
@@ -1194,6 +1195,7 @@ function viewQuiz(){
     <div class="prog"><i style="width:${Math.round(i/n*100)}%"></i></div>
     <div class="subj-meta">Vraag ${i+1} van ${n} · ${esc(subjName(state.quiz.subjectId))}</div>
     <div class="q-topic">${esc(q.topic)}</div><div class="q-text">${esc(q.question)}</div>
+    ${(q.type==='mc'&&!state.quiz.revealed&&mcTime(q))?`<div class="subj-meta" style="margin:2px 0 10px">⏱️ Tijd over: <b id="qcount">${mcTime(q)}s</b></div>`:''}
     ${fb}${body}<div style="margin-top:14px">${footer}</div>`;
 }
 
@@ -1214,6 +1216,7 @@ function gradeCurrent(correct){
     qz.lastFb = q.type==='pin' ? 'Net naast de juiste plek.'
       : (q.type==='map'&&looseEqual(qz.typedDraft,q.answer)) ? 'Bijna! Let goed op de spelling en hoofdletters.'
       : q.type==='map' ? 'Niet juist — het moet exact goed gespeld zijn.'
+      : qz.timedOut ? '⏱ Tijd voorbij — de vraag is fout gerekend.'
       : 'Helaas — bekijk de uitleg.';
     qz.lastFbOk=false;
   }
@@ -1228,7 +1231,7 @@ function gradeCurrent(correct){
 }
 function advance(){
   const qz=state.quiz;
-  if(qz.idx+1<qz.qs.length){ qz.idx++; qz.sel=null; qz.revealed=false; qz.graded=false; qz.lastFb=''; qz.typedDraft=''; qz.pin=null; qz.qShownAt=Date.now(); render(); }
+  if(qz.idx+1<qz.qs.length){ qz.idx++; qz.sel=null; qz.revealed=false; qz.graded=false; qz.timedOut=false; qz.lastFb=''; qz.typedDraft=''; qz.pin=null; qz.qShownAt=Date.now(); render(); }
   else finishQuiz();
 }
 async function finishQuiz(){
@@ -1501,6 +1504,7 @@ function viewManage(){
           <div id="pinPrev">${pinPrev}</div>
         </div>
         <label class="fld"><span>Uitleg (optioneel)</span><input class="inp" id="qExpl" placeholder="Korte toelichting"></label>
+        <label class="fld"><span>Tijdslimiet voor multiplechoice (seconden, optioneel — leeg = standaard 15, Wiskunde 30)</span><input class="inp" id="qTime" type="number" min="3" max="600" placeholder="bijv. 20"></label>
         <button class="btn" data-add-question style="width:100%;justify-content:center">Vraag toevoegen</button></div>
 
       <div class="card"><h2 class="mh">Alle vragen (${content.questions.length})</h2>${qlist}</div>
@@ -1588,6 +1592,18 @@ function launchConfetti(){
 function startTimerDisplay(){ stopTimer(); timerInt=setInterval(()=>{const el=document.getElementById('timer');
   if(!el||!state.quiz){stopTimer();return;} el.textContent=fmtDur(Math.round((Date.now()-state.quiz.startedAt)/1000));},1000); }
 function stopTimer(){ if(timerInt){clearInterval(timerInt);timerInt=null;} }
+// Per-vraag afteltimer voor multiplechoice: instelbaar via q.timeLimit, anders 15s (Wiskunde 30s).
+function mcTime(q){ if(!q||q.type!=='mc') return 0; if(typeof q.timeLimit==='number'&&q.timeLimit>0) return q.timeLimit; return q.subjectId==='wi'?30:15; }
+let qTimerInt=null;
+function clearQTimer(){ if(qTimerInt){clearInterval(qTimerInt);qTimerInt=null;} }
+function startQTimer(){ clearQTimer(); const qz=state.quiz; if(!qz) return; const q=qz.qs[qz.idx]; const lim=mcTime(q);
+  if(!lim||qz.revealed) return; const deadline=qz.qShownAt+lim*1000;
+  const tick=()=>{ const el=document.getElementById('qcount'); const rem=Math.max(0,Math.ceil((deadline-Date.now())/1000));
+    if(el){ el.textContent=rem+'s'; if(rem<=5) el.style.color='var(--weak)'; }
+    if(Date.now()>=deadline){ clearQTimer(); timeUpMC(); } };
+  tick(); qTimerInt=setInterval(tick,200); }
+function timeUpMC(){ const qz=state.quiz; if(!qz) return; const q=qz.qs[qz.idx];
+  if(!q||q.type!=='mc'||qz.revealed) return; qz.sel=null; qz.timedOut=true; gradeCurrent(false); }
 
 /* ===================== Events ===================== */
 const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-chart-group','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-reset-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-do-update','data-remote-test','data-remote-pull'];
@@ -1697,6 +1713,7 @@ document.addEventListener('click',async(e)=>{
       if(lines.length<2){alert('Geef minstens 2 antwoordopties.');return;}
       const ans=lines.findIndex(l=>l.startsWith('*')); if(ans<0){alert('Markeer het juiste antwoord met een * ervoor.');return;}
       nq.options=lines.map(l=>l.replace(/^\*/,'').trim()); nq.answer=ans;
+      const tm=parseInt(document.getElementById('qTime').value,10); if(!isNaN(tm)&&tm>0) nq.timeLimit=tm;
     }else if(type==='map'){ const a=document.getElementById('qMapAns').value.trim();
       if(!a){alert('Vul het juiste antwoord in.');return;}
       const sb=subj(subjectId);
