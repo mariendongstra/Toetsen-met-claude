@@ -367,13 +367,13 @@ function seedContent(){
     ],
     questions:[
       // ---- §6.1 Renaissance ----
-      Q({topic:T1,type:'mc',question:"Wat betekent het woord 'renaissance' letterlijk?",
+      Q({topic:T1,type:'mc',group:'g-ren-betekenis',question:"Wat betekent het woord 'renaissance' letterlijk?",
         options:['Wedergeboorte','Verlichting','Vooruitgang','Hervorming'],answer:0,
         explanation:'Renaissance betekent "wedergeboorte": de herontdekking van de klassieke cultuur van Grieken en Romeinen.'}),
       Q({topic:T1,type:'mc',question:'In welk gebied begon de renaissance?',
         options:['De Italiaanse steden','Engeland','De Duitse landen','Spanje'],answer:0,
         explanation:'De renaissance begon in rijke Italiaanse handelssteden zoals Florence, waar veel Romeinse overblijfselen lagen.'}),
-      Q({topic:T1,type:'mc',question:'Welke techniek zorgde ervoor dat schilders diepte (ruimte) in een schilderij konden weergeven?',
+      Q({topic:T1,type:'mc',group:'g-ren-perspectief',question:'Welke techniek zorgde ervoor dat schilders diepte (ruimte) in een schilderij konden weergeven?',
         options:['Perspectief','Goudgrond','Symboliek','Verkorting'],answer:0,
         explanation:'Met perspectief lijken voorwerpen verder weg kleiner: het schilderij krijgt diepte en wordt realistisch.'}),
       Q({topic:T1,type:'mc',question:'Rijke families zoals de Medici betaalden kunstenaars om kunst te maken. Hoe noem je zo’n beschermheer/geldschieter van kunst?',
@@ -388,10 +388,10 @@ function seedContent(){
       Q({topic:T2,type:'mc',question:'Wat is het humanisme?',
         options:['Een denkrichting die de klassieke teksten bestudeert en de mens centraal stelt','Een nieuwe godsdienst','Een soort regering','Een handelsroute naar Azië'],answer:0,
         explanation:'Humanisten bestudeerden teksten van Grieken en Romeinen en stelden de mens en het aardse leven centraal.'}),
-      Q({topic:T2,type:'mc',question:'Welke beroemde humanist uit Rotterdam schreef "Lof der Zotheid"?',
+      Q({topic:T2,type:'mc',group:'g-hum-erasmus',question:'Welke beroemde humanist uit Rotterdam schreef "Lof der Zotheid"?',
         options:['Erasmus','Maarten Luther','Gutenberg','Christoffel Columbus'],answer:0,
         explanation:'Desiderius Erasmus van Rotterdam was de bekendste humanist; in "Lof der Zotheid" bekritiseerde hij o.a. misstanden in de kerk.'}),
-      Q({topic:T2,type:'mc',question:'Welke uitvinding rond 1450 zorgde dat boeken en ideeën zich veel sneller verspreidden?',
+      Q({topic:T2,type:'mc',group:'g-hum-druk',question:'Welke uitvinding rond 1450 zorgde dat boeken en ideeën zich veel sneller verspreidden?',
         options:['De boekdrukkunst','Het kompas','Het buskruit','De telescoop'],answer:0,
         explanation:'Gutenberg vond de boekdrukkunst met losse letters uit: boeken werden goedkoper en sneller gemaakt.'}),
       Q({topic:T2,type:'flash',question:'Leg uit waarom de boekdrukkunst de verspreiding van nieuwe ideeën hielp.',
@@ -400,10 +400,10 @@ function seedContent(){
         options:['De humanist stelt de mens en het aardse leven centraal, de middeleeuwer vooral God en het hiernamaals','De humanist kon niet lezen','De middeleeuwer geloofde niet in God','Er is geen verschil'],answer:0,
         explanation:'Het draait om de mentaliteit: aandacht voor de mens en deze wereld (humanisme) tegenover de gerichtheid op God en het hiernamaals.'}),
       // ---- §6.3 Ontdekkingsreizen ----
-      Q({topic:T3,type:'mc',question:'Wie bereikte in 1492 in dienst van Spanje (per ongeluk) Amerika?',
+      Q({topic:T3,type:'mc',group:'g-ont-columbus',question:'Wie bereikte in 1492 in dienst van Spanje (per ongeluk) Amerika?',
         options:['Christoffel Columbus','Vasco da Gama','Ferdinand Magellaan','Marco Polo'],answer:0,
         explanation:'Columbus zeilde westwaarts om Azië te bereiken, maar kwam in 1492 bij Amerika aan.'}),
-      Q({topic:T3,type:'mc',question:'Welke Portugese ontdekkingsreiziger zeilde om Afrika heen naar India?',
+      Q({topic:T3,type:'mc',group:'g-ont-gama',question:'Welke Portugese ontdekkingsreiziger zeilde om Afrika heen naar India?',
         options:['Vasco da Gama','Christoffel Columbus','Hernán Cortés','Amerigo Vespucci'],answer:0,
         explanation:'Vasco da Gama bereikte in 1498 via de zuidpunt van Afrika India: de zeeroute voor de specerijenhandel.'}),
       Q({topic:T3,type:'mc',question:'Wat was de belangrijkste reden voor de ontdekkingsreizen?',
@@ -421,13 +421,13 @@ function seedContent(){
         options:['Hij dacht dat hij in Indië (Azië) was aangekomen','Ze noemden zichzelf zo','Ze kwamen oorspronkelijk uit India','Het was de naam van hun koning'],answer:0,
         explanation:'Columbus geloofde dat hij Azië/Indië had bereikt, dus noemde hij de inwoners "indianen" — een misverstand dat bleef hangen.'}),
       // ---- §6.4 Einde Amerikaanse culturen ----
-      Q({topic:T4,type:'mc',question:'Welk volk had een groot rijk in het huidige Mexico, met als hoofdstad Tenochtitlán?',
+      Q({topic:T4,type:'mc',group:'g-ein-azteken',question:'Welk volk had een groot rijk in het huidige Mexico, met als hoofdstad Tenochtitlán?',
         options:['De Azteken','De Inca’s','De Grieken','De Romeinen'],answer:0,
         explanation:'De Azteken heersten over Midden-Amerika vanuit hun hoofdstad Tenochtitlán (nu Mexico-Stad).'}),
       Q({topic:T4,type:'mc',question:'Welk volk had een groot rijk in de Andes (het huidige Peru)?',
         options:['De Inca’s','De Azteken','De Maya’s','De Vikingen'],answer:0,
         explanation:'De Inca’s bouwden een uitgestrekt rijk in het Andesgebergte in Zuid-Amerika.'}),
-      Q({topic:T4,type:'mc',question:'Hoe worden de Spaanse veroveraars van Amerika genoemd?',
+      Q({topic:T4,type:'mc',group:'g-ein-conq',question:'Hoe worden de Spaanse veroveraars van Amerika genoemd?',
         options:['Conquistadores','Humanisten','Mecenassen','Kruisvaarders'],answer:0,
         explanation:'Conquistadores (Spaans voor "veroveraars") zoals Cortés en Pizarro veroverden de Amerikaanse rijken.'}),
       Q({topic:T4,type:'mc',question:'Welke factor doodde verreweg de meeste inheemse Amerikanen na de komst van de Europeanen? (inzicht)',
@@ -438,6 +438,71 @@ function seedContent(){
       Q({topic:T4,type:'mc',question:'Hernán Cortés veroverde rond 1521 het rijk van welk volk?',
         options:['De Azteken','De Inca’s','De Maya’s','De Egyptenaren'],answer:0,
         explanation:'Cortés versloeg de Azteken; Francisco Pizarro veroverde later het rijk van de Inca’s.'}),
+      // ---- §6.1 Renaissance — uitbreiding ----
+      Q({topic:T1,type:'mc',question:'In welke Italiaanse stad bloeide de renaissance vooral op, mede dankzij de rijke familie De Medici?',
+        options:['Florence','Venetië','Napels','Milaan'],answer:0,
+        explanation:'Florence was schatrijk door handel en bankieren; de Medici betaalden veel kunstenaars. Daardoor werd de stad het hart van de renaissance.',bron:'Memo 1B §6.1'}),
+      Q({topic:T1,type:'mc',group:'g-ren-betekenis',question:'Welke vertaling past het best bij het woord “renaissance”?',
+        options:['Wedergeboorte','Verlichting','Opstand','Bevrijding'],answer:0,
+        explanation:'“Renaissance” is Frans voor wedergeboorte: de herontdekking van de klassieke (Grieks-Romeinse) cultuur.',bron:'Memo 1B §6.1'}),
+      Q({topic:T1,type:'mc',group:'g-ren-perspectief',question:'Hoe heet de techniek waarmee schilders een plat doek toch diepte gaven?',
+        options:['Perspectief','Symboliek','Goudgrond','Mozaïek'],answer:0,
+        explanation:'Met perspectief tekenden schilders verre voorwerpen kleiner, waardoor het schilderij ruimtelijk en realistisch werd.',bron:'Memo 1B §6.1'}),
+      Q({topic:T1,type:'mc',question:'Waarop baseerden renaissancekunstenaars en -denkers hun idealen?',
+        options:['De klassieke oudheid van Grieken en Romeinen','De kunst van de Vikingen','De cultuur van de Azteken','De gebruiken van de Egyptenaren'],answer:0,
+        explanation:'De renaissance keek bewust terug naar de Grieks-Romeinse oudheid als voorbeeld voor kunst, wetenschap en denken.',bron:'Memo 1B §6.1'}),
+      Q({topic:T1,type:'flash',question:'Noem twee verschillen tussen een middeleeuws schilderij en een renaissanceschilderij.',
+        answer:'Bijvoorbeeld: een renaissanceschilderij gebruikt perspectief/diepte en is realistischer, en de mens (lichaam, gevoel) staat centraal, terwijl middeleeuwse schilderijen platter zijn en vooral religieuze symboliek tonen.',bron:'Memo 1B §6.1'}),
+      // ---- §6.2 Humanisme — uitbreiding ----
+      Q({topic:T2,type:'mc',group:'g-hum-erasmus',question:'Wie wordt gezien als de beroemdste humanist uit de Lage Landen en schreef “Lof der Zotheid”?',
+        options:['Erasmus','Maarten Luther','Johannes Gutenberg','Thomas More'],answer:0,
+        explanation:'Erasmus van Rotterdam bekritiseerde in “Lof der Zotheid” onder andere misstanden in de kerk.',bron:'Memo 1B §6.2'}),
+      Q({topic:T2,type:'mc',group:'g-hum-druk',question:'Welke uitvinding van Gutenberg zorgde dat teksten veel sneller en goedkoper verspreid werden?',
+        options:['De boekdrukkunst met losse letters','Het kompas','De telescoop','Het buskruit'],answer:0,
+        explanation:'Met losse loden letters kon je snel veel boeken drukken; ideeën verspreidden zich daardoor razendsnel.',bron:'Memo 1B §6.2'}),
+      Q({topic:T2,type:'mc',question:'Welke twee talen bestudeerden humanisten om de oorspronkelijke klassieke teksten te kunnen lezen?',
+        options:['Latijn en Grieks','Frans en Engels','Spaans en Italiaans','Duits en Nederlands'],answer:0,
+        explanation:'Humanisten gingen terug naar de bron: ze leerden Latijn en Grieks om de klassieke teksten zelf te lezen.',bron:'Memo 1B §6.2'}),
+      Q({topic:T2,type:'flash',question:'Wat bedoelen historici als ze zeggen dat bij de humanisten “de mens centraal staat”?',
+        answer:'Humanisten hadden vooral aandacht voor de mens zelf: zijn verstand, talenten en het aardse leven — in plaats van alleen God en het hiernamaals zoals in de middeleeuwen.',bron:'Memo 1B §6.2'}),
+      // ---- §6.3 Ontdekkingsreizen — uitbreiding ----
+      Q({topic:T3,type:'mc',group:'g-ont-columbus',question:'Wie kwam in 1492 in dienst van Spanje (per ongeluk) in Amerika terecht?',
+        options:['Christoffel Columbus','Vasco da Gama','Ferdinand Magellaan','Hernán Cortés'],answer:0,
+        explanation:'Columbus wilde westwaarts naar Azië varen, maar stuitte onderweg op Amerika.',bron:'Memo 1B §6.3'}),
+      Q({topic:T3,type:'mc',group:'g-ont-gama',question:'Wie voer als eerste helemaal om Afrika heen naar India (1498)?',
+        options:['Vasco da Gama','Christoffel Columbus','Amerigo Vespucci','Marco Polo'],answer:0,
+        explanation:'Vasco da Gama opende via de zuidpunt van Afrika de zeeroute naar India voor de specerijenhandel.',bron:'Memo 1B §6.3'}),
+      Q({topic:T3,type:'mc',question:'Welke gewilde handelswaar uit Azië jaagde de ontdekkingsreizen vooral aan?',
+        options:['Specerijen','Steenkool','Wol','Graan'],answer:0,
+        explanation:'Specerijen (zoals peper en kaneel) waren duur en zeer gewild; een eigen zeeroute maakte ze goedkoper.',bron:'Memo 1B §6.3'}),
+      Q({topic:T3,type:'mc',question:'In het Verdrag van Tordesillas (1494) verdeelde Spanje de nieuwe wereld met welk land?',
+        options:['Portugal','Engeland','Frankrijk','Italië'],answer:0,
+        explanation:'Spanje en Portugal trokken een denkbeeldige lijn en verdeelden de nog te ontdekken gebieden onder elkaar.',bron:'Memo 1B §6.3'}),
+      Q({topic:T3,type:'flash',question:'Noem twee hulpmiddelen of uitvindingen die verre zeereizen mogelijk maakten.',
+        answer:'Bijvoorbeeld het kompas (richting bepalen), het astrolabium (positie bepalen), betere schepen zoals de karveel en nauwkeurigere zeekaarten.',bron:'Memo 1B §6.3'}),
+      // ---- §6.4 Einde Amerikaanse culturen — uitbreiding ----
+      Q({topic:T4,type:'mc',group:'g-ein-azteken',question:'Welk volk had Tenochtitlán als hoofdstad in het huidige Mexico?',
+        options:['De Azteken','De Inca’s','De Maya’s','De Olmeken'],answer:0,
+        explanation:'De Azteken heersten vanuit Tenochtitlán (nu Mexico-Stad) over een groot rijk in Midden-Amerika.',bron:'Memo 1B §6.4'}),
+      Q({topic:T4,type:'mc',group:'g-ein-conq',question:'Hoe noem je de Spaanse veroveraars zoals Cortés en Pizarro?',
+        options:['Conquistadores','Mecenassen','Humanisten','Kruisvaarders'],answer:0,
+        explanation:'Conquistador is Spaans voor “veroveraar”; zij onderwierpen de Amerikaanse rijken.',bron:'Memo 1B §6.4'}),
+      Q({topic:T4,type:'mc',question:'Welke conquistador veroverde het rijk van de Inca’s in de Andes?',
+        options:['Francisco Pizarro','Hernán Cortés','Vasco da Gama','Christoffel Columbus'],answer:0,
+        explanation:'Pizarro versloeg de Inca’s; Cortés had eerder de Azteken verslagen.',bron:'Memo 1B §6.4'}),
+      Q({topic:T4,type:'flash',question:'Waarom waren de door Europeanen meegebrachte ziekten zo dodelijk voor de inheemse bevolking?',
+        answer:'De inheemse bevolking was nog nooit in aanraking gekomen met ziekten als de pokken en had er geen weerstand (immuniteit) tegen. Daardoor stierven er enorm veel mensen.',bron:'Memo 1B §6.4'}),
+      // ---- Inzichtvragen (gymnasium — doordenken) ----
+      Q({topic:T1,type:'flash',question:'Inzicht: leg uit waarom de renaissance juist in de Italiaanse handelssteden begon en niet elders in Europa.',
+        answer:'Die steden waren rijk door handel (geld voor kunst en mecenassen) én lagen vol overblijfselen van de Romeinse oudheid. Rijkdom en klassieke inspiratie kwamen daar samen, terwijl elders één van beide ontbrak.',bron:'Memo 1B §6.1'}),
+      Q({topic:T2,type:'flash',question:'Inzicht: verklaar hoe de boekdrukkunst en het humanisme elkaar versterkten.',
+        answer:'Door de boekdrukkunst werden (klassieke en humanistische) teksten goedkoop en in grote aantallen verspreid. Meer mensen konden lezen en nieuwe, kritische ideeën verspreidden zich sneller — wat het humanisme juist groot maakte.',bron:'Memo 1B §6.2'}),
+      Q({topic:T3,type:'flash',question:'Inzicht: waarom leidde de zoektocht naar een zeeroute naar Azië juist tot de “ontdekking” van Amerika?',
+        answer:'De landroute naar Azië was lang, duur en deels geblokkeerd door het Ottomaanse Rijk. Daarom zochten Europeanen een zeeroute; Columbus voer westwaarts om Azië te bereiken en stuitte onderweg onverwacht op Amerika.',bron:'Memo 1B §6.3'}),
+      Q({topic:T4,type:'flash',question:'Inzicht: verklaar waarom een kleine groep Spanjaarden de enorme rijken van de Azteken en Inca’s kon verslaan.',
+        answer:'Een combinatie van factoren: meegebrachte ziekten (pokken) die de bevolking decimeerden, paarden, stalen wapens en vuurwapens, én bondgenootschappen met volken die onderdrukt werden door de Azteken/Inca’s en zich tegen hen keerden.',bron:'Memo 1B §6.4'}),
+      Q({topic:T4,type:'flash',question:'Inzicht: leg uit hoe renaissance, boekdrukkunst en ontdekkingsreizen samen het wereldbeeld van Europeanen veranderden.',
+        answer:'De renaissance/het humanisme maakte het denken mensgerichter en kritischer, de boekdrukkunst verspreidde die nieuwe kennis razendsnel, en de ontdekkingsreizen lieten letterlijk nieuwe werelddelen zien. Samen doorbraken ze het strikt middeleeuwse, op God en het hiernamaals gerichte wereldbeeld.',bron:'Memo 1B §6.1–6.4'}),
       // ====================== BIOLOGIE — Biologie voor jou Max 1B, Thema 5 ======================
       // ---- §5.1 Je omgeving waarnemen ----
       B({topic:B1,type:'mc',question:'Wat is een zintuig?',
@@ -904,7 +969,7 @@ function viewSetup(){
   const sOpts=subs.map(s=>`<option value="${s.id}" ${s.id===sid?'selected':''}>${esc(s.name)}</option>`).join('');
   const tChecks=ts.map(t=>`<button class="chk ${state.setup.topics.includes(t)?'on':''}" data-toggle-topic="${esc(t)}">${esc(t)}</button>`).join('')
     ||`<span class="subj-meta">Dit vak heeft nog geen onderwerpen.</span>`;
-  const pool=content.questions.filter(q=>q.subjectId===sid&&state.setup.topics.includes(q.topic)).length;
+  const pool=dedupeGroups(content.questions.filter(q=>q.subjectId===sid&&state.setup.topics.includes(q.topic))).length;
   const maxN=Math.min(pool,30), cnt=Math.min(state.setup.count,maxN)||(pool?1:0);
   return `<p class="h-eyebrow">Nieuwe quest</p><h1 class="h1">Stel je toets samen</h1>
     <div class="card" style="max-width:560px">
@@ -918,10 +983,15 @@ function viewSetup(){
     <p class="subj-meta" style="margin-top:14px;max-width:560px">Tip: goede antwoorden op rij geven een combo-bonus, en snel antwoorden levert extra XP op.</p>`;
 }
 
+// Houdt max. één vraag per 'group' over, zodat herformuleerde varianten nooit samen in één quiz komen.
+function dedupeGroups(list){ const seen=new Set(); const out=[]; for(const q of list){ if(q&&q.group){ if(seen.has(q.group)) continue; seen.add(q.group); } out.push(q); } return out; }
+// Toont de paragraaf-bron (waar het antwoord in het boek staat) bij de uitleg.
+function bronHtml(q){ return q&&q.bron?`<div class="expl" style="font-size:12px;opacity:.75;margin-top:6px">📖 ${esc(q.bron)}</div>`:''; }
 function buildQuiz(){
   const {subjectId,topics,count}=state.setup;
   let pool=content.questions.filter(q=>q.subjectId===subjectId&&topics.includes(q.topic));
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  pool=dedupeGroups(pool); // varianten van dezelfde vraag niet samen
   pool=pool.slice(0,Math.min(count,pool.length));
   const qs=pool.map(q=>{ if(q.type==='mc'){
       const opts=q.options.map((o,i)=>({o,correct:i===q.answer}));
@@ -941,7 +1011,7 @@ function viewQuiz(){
       else if(state.quiz.sel===k)cls+=' sel';
       const mk=state.quiz.revealed?(o.correct?'<span class="mark">✓</span>':(state.quiz.sel===k?'<span class="mark">✕</span>':'')):'';
       return `<button class="${cls}" data-pick="${k}" ${state.quiz.revealed?'disabled':''}>${esc(o.o)}${mk}</button>`;}).join('');
-    if(state.quiz.revealed&&q.explanation) body+=`<div class="expl">${esc(q.explanation)}</div>`;
+    if(state.quiz.revealed){ if(q.explanation) body+=`<div class="expl">${esc(q.explanation)}</div>`; body+=bronHtml(q); }
   }else if(q.type==='pin'){
     const sb=subj(state.quiz.subjectId);
     const mImg=q.image||(sb&&sb.mapImage)||'';
@@ -954,7 +1024,7 @@ function viewQuiz(){
       body=`<div style="font-weight:500;color:var(--muted);font-size:13px;margin-bottom:8px">Klik of tik op de kaart op de juiste plek.${pin?'':' (nog geen plek gekozen)'}</div>${wrap('')}`;
     }else{
       body=`<div style="font-weight:500;color:var(--muted);font-size:13px;margin-bottom:8px">🔵 jouw plek · 🔴 juiste plek</div>${wrap(mk(tgt,'var(--weak)'))}
-        ${q.answer?`<div class="ans" style="text-align:center"><b>Gezocht:</b> ${esc(q.answer)}</div>`:''}${q.explanation?`<div class="expl">${esc(q.explanation)}</div>`:''}`;
+        ${q.answer?`<div class="ans" style="text-align:center"><b>Gezocht:</b> ${esc(q.answer)}</div>`:''}${q.explanation?`<div class="expl">${esc(q.explanation)}</div>`:''}${bronHtml(q)}`;
     }
   }else{
     const draft=state.quiz.typedDraft||'';
@@ -972,7 +1042,7 @@ function viewQuiz(){
       body=`<div class="flash">${labeledImg?`<div style="font-weight:500;color:var(--muted);font-size:12.5px;margin-bottom:4px">Kaart met namen</div>${labeledImg}`:''}
         <div style="font-weight:500;color:var(--muted);font-size:12.5px;margin-bottom:4px">Jouw antwoord</div>
         <div style="font-size:15.5px;white-space:pre-wrap">${draft?esc(draft):'<span style="color:var(--muted)">(leeg gelaten)</span>'}</div>
-        <div class="ans"><b>${isMap?'Juiste antwoord':'Modelantwoord'}:</b> ${esc(q.answer)}</div>${q.explanation?`<div class="expl">${esc(q.explanation)}</div>`:''}</div>`;
+        <div class="ans"><b>${isMap?'Juiste antwoord':'Modelantwoord'}:</b> ${esc(q.answer)}</div>${q.explanation?`<div class="expl">${esc(q.explanation)}</div>`:''}${bronHtml(q)}</div>`;
     }
   }
   let fb=state.quiz.revealed&&state.quiz.lastFb?`<div class="feedback ${state.quiz.lastFbOk?'ok':'no'}">${esc(state.quiz.lastFb)}</div>`:'<div class="feedback"></div>';
