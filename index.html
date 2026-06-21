@@ -314,6 +314,8 @@ function storageLabel(){
 
 /* ===================== Voorgeladen data ===================== */
 const DEFAULT_LEVELS=['Basisschool groep 6','Basisschool groep 7','Basisschool groep 8','VWO gymnasium klas 1','VWO gymnasium klas 2'];
+// Verhoog dit nummer telkens als er nieuwe lesstof in de seed bijkomt; opgeslagen data met een lager nummer krijgt een verplichte updatemelding.
+const CONTENT_VERSION=3;
 function seedContent(){
   const S='gs', T1='§6.1 De Renaissance', T2='§6.2 Het humanisme', T3='§6.3 De ontdekkingsreizen', T4='§6.4 Einde Amerikaanse culturen';
   const Q=(o)=>Object.assign({id:'s'+(Q._n=(Q._n||0)+1), subjectId:S},o);
@@ -328,6 +330,7 @@ function seedContent(){
   const B_S='bio', B1='§5.1 Je omgeving waarnemen', B2='§5.2 Voelen, ruiken en proeven', B3='§5.3 Horen en zien', B4='§5.4 Het zenuwstelsel', B5='§5.5 Gedrag', B6='§5.6 Regeling';
   const B=(o)=>Object.assign({id:'b'+(B._n=(B._n||0)+1), subjectId:B_S},o);
   return {
+    _v:CONTENT_VERSION,
     levels:[...DEFAULT_LEVELS],
     adminCode:'1234',
     students:[],
@@ -655,15 +658,26 @@ async function init(){
   try{
     let c=await sget(KEYS.content);
     const hadContent=!!c;
+    const storedV=(c&&typeof c._v==='number')?c._v:0;
     if(!c){ c=seedContent(); }
     content=migrate(c);
-    if(!hadContent && !state.remoteFailed) await sset(KEYS.content,content); // alleen wegschrijven als er nog niets stond
+    // Nieuwe lesstof aanwezig in deze app-versie maar nog niet in de opgeslagen data?
+    state.needsUpdate = hadContent && storedV < CONTENT_VERSION;
+    if(!hadContent && !state.remoteFailed){ content._v=CONTENT_VERSION; await sset(KEYS.content,content); } // alleen wegschrijven als er nog niets stond
     attempts=(await sget(KEYS.attempts))||[];
     profile=await sget(KEYS.profile,false); // onthoudt op dit apparaat wie ingelogd is
   }catch(e){ console.error('init',e); if(!content) content=migrate(seedContent()); attempts=attempts||[]; }
   if(profile&&profile.studentId&&currentStudent()){ state.mode='student'; state.view='dashboard'; }
   else { state.mode=null; state.view='login'; }
   render();
+  if(state.needsUpdate) showUpdateModal(); // verplichte updatemelding bovenop alles
+}
+function showUpdateModal(){
+  document.getElementById('modal').innerHTML=`<div class="modal-bg"><div class="modal pos" style="max-width:420px">
+    <div class="modal-in"><h3>Nieuwe lesstof beschikbaar 🎉</h3>
+    <p class="subj-meta" style="margin:0 0 14px">Er zijn nieuwe vakken en toetsen toegevoegd. Je opgeslagen gegevens op dit apparaat worden nu bijgewerkt naar de nieuwste versie. Leerlingen en resultaten blijven behouden.</p>
+    <button class="btn" data-do-update style="width:100%;justify-content:center">Nu bijwerken</button>
+    </div></div></div>`;
 }
 function currentStudent(){ return profile&&profile.studentId?content.students.find(s=>s.id===profile.studentId):null; }
 async function loginStudent(id){ profile={studentId:id}; await sset(KEYS.profile,profile,false); state.mode='student'; }
@@ -1306,7 +1320,7 @@ function startTimerDisplay(){ stopTimer(); timerInt=setInterval(()=>{const el=do
 function stopTimer(){ if(timerInt){clearInterval(timerInt);timerInt=null;} }
 
 /* ===================== Events ===================== */
-const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-remote-test','data-remote-pull'];
+const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-do-update','data-remote-test','data-remote-pull'];
 function findAction(start){ let el=start;
   while(el&&el.nodeType===1){ for(const a of ACTION_ATTRS){ if(el.hasAttribute(a)) return el; } el=el.parentElement; }
   return null; }
@@ -1437,11 +1451,14 @@ document.addEventListener('click',async(e)=>{
     attempts=[]; await sset(KEYS.attempts,attempts); closeModal(); render(); return; }
   if(t.hasAttribute('data-refresh-content')){
     const before=content.subjects.length+content.questions.length;
-    content=migrate(content); await sset(KEYS.content,content);
+    content=migrate(content); content._v=CONTENT_VERSION; await sset(KEYS.content,content);
     const added=(content.subjects.length+content.questions.length)-before;
     closeModal(); render();
     alert(added>0 ? ('Lesstof ververst ✓ '+added+' nieuwe vakken/vragen toegevoegd.') : 'Lesstof is al up-to-date ✓ Alles staat al klaar.');
     return; }
+  if(t.hasAttribute('data-do-update')){
+    content=migrate(content); content._v=CONTENT_VERSION; await sset(KEYS.content,content);
+    state.needsUpdate=false; closeModal(); render(); return; }
   if(t.hasAttribute('data-remote-test')){ if(!remoteOn()){alert('Online opslag is niet ingesteld. Vul REMOTE.binId en REMOTE.key bovenin het bestand in.');return;}
     t.textContent='Bezig…';
     try{ await remoteAll(true); state.remoteFailed=false; alert('Verbinding met de online opslag is gelukt ✓'); }
