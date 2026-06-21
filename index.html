@@ -331,6 +331,18 @@ async function sset(k,v,shared=true){
   if(LS){ try{localStorage.setItem(k,s);return true;}catch(e){return false;} }
   mem[k]=s; return true;
 }
+// Sessies hard overschrijven (i.p.v. samenvoegen) — nodig voor reset: anders komen gewiste sessies online weer terug.
+async function replaceAttempts(){
+  const s=JSON.stringify(attempts);
+  if(remoteOn() && !state.remoteFailed){
+    try{ let cur=await remoteAll(true); if(!cur||typeof cur!=='object') cur={}; cur[KEYS.attempts]=attempts; await remoteWrite(cur); _rcache=cur; _rat=Date.now();
+      if(LS){try{localStorage.setItem(KEYS.attempts,s);}catch(e){}} return true; }
+    catch(e){ console.warn('online reset mislukt',e); state.remoteFailed=true; }
+  }
+  if(hasStore){ try{await withTimeout(window.storage.set(KEYS.attempts,s,true),4000);}catch(e){} }
+  if(LS){ try{localStorage.setItem(KEYS.attempts,s);}catch(e){} }
+  mem[KEYS.attempts]=s; return true;
+}
 // Opslaglocatie voor de gebruiker leesbaar
 function storageLabel(){
   if(remoteOn()) return state.remoteFailed?'online bin (nu onbereikbaar — lokale kopie wordt getoond)':'gedeelde online opslag (JSONBin)';
@@ -340,7 +352,7 @@ function storageLabel(){
 /* ===================== Voorgeladen data ===================== */
 const DEFAULT_LEVELS=['Basisschool groep 6','Basisschool groep 7','Basisschool groep 8','VWO gymnasium klas 1','VWO gymnasium klas 2'];
 // Verhoog dit nummer telkens als er nieuwe lesstof in de seed bijkomt; opgeslagen data met een lager nummer krijgt een verplichte updatemelding.
-const CONTENT_VERSION=3;
+const CONTENT_VERSION=4;
 function seedContent(){
   const S='gs', T1='§6.1 De Renaissance', T2='§6.2 Het humanisme', T3='§6.3 De ontdekkingsreizen', T4='§6.4 Einde Amerikaanse culturen';
   const Q=(o)=>Object.assign({id:'s'+(Q._n=(Q._n||0)+1), subjectId:S},o);
@@ -505,10 +517,10 @@ function seedContent(){
         answer:'De renaissance/het humanisme maakte het denken mensgerichter en kritischer, de boekdrukkunst verspreidde die nieuwe kennis razendsnel, en de ontdekkingsreizen lieten letterlijk nieuwe werelddelen zien. Samen doorbraken ze het strikt middeleeuwse, op God en het hiernamaals gerichte wereldbeeld.',bron:'Memo 1B §6.1–6.4'}),
       // ====================== BIOLOGIE — Biologie voor jou Max 1B, Thema 5 ======================
       // ---- §5.1 Je omgeving waarnemen ----
-      B({topic:B1,type:'mc',question:'Wat is een zintuig?',
+      B({topic:B1,type:'mc',group:'g-bio-zintuig',question:'Wat is een zintuig?',
         options:['Een orgaan dat reageert op prikkels','Een spier die een beweging maakt','Een signaal dat naar de hersenen gaat','Een klier die hormonen maakt'],answer:0,
         explanation:'Een zintuig (zoals oog, oor, neus, tong of huid) is een orgaan dat reageert op prikkels uit de omgeving.'}),
-      B({topic:B1,type:'mc',question:'Wat is een prikkel?',
+      B({topic:B1,type:'mc',group:'g-bio-prikkel',question:'Wat is een prikkel?',
         options:['Een invloed vanuit de omgeving op een organisme','Een elektrisch signaal in een zenuw','Een reactie van een spier','Een cel in een zintuig'],answer:0,
         explanation:'Een prikkel is een invloed uit de omgeving, bijvoorbeeld licht, geluid, geur, warmte of aanraking.'}),
       B({topic:B1,type:'mc',question:'Hoe heet het elektrische signaal dat vanuit een zintuig via de zenuwen naar de hersenen gaat?',
@@ -547,7 +559,7 @@ function seedContent(){
       B({topic:B3,type:'mc',question:'Op welke prikkel reageert het gezichtszintuig (de ogen)?',
         options:['Licht','Geluid','Geur','Zwaartekracht'],answer:0,
         explanation:'Het gezichtszintuig in de ogen reageert op de prikkel licht.'}),
-      B({topic:B3,type:'mc',question:'Welk deel van het oog regelt hoeveel licht er naar binnen valt?',
+      B({topic:B3,type:'mc',group:'g-bio-iris',question:'Welk deel van het oog regelt hoeveel licht er naar binnen valt?',
         options:['De iris (regenboogvlies), door de pupil groter of kleiner te maken','De lens','Het netvlies','Het trommelvlies'],answer:0,
         explanation:'De iris maakt de pupil groter of kleiner en regelt zo hoeveel licht het oog binnenkomt.'}),
       B({topic:B3,type:'mc',question:'Waar in het oog liggen de zintuigcellen (staafjes en kegeltjes) die licht opvangen?',
@@ -568,7 +580,7 @@ function seedContent(){
       B({topic:B4,type:'mc',question:'Wat doen bewegingszenuwen?',
         options:['Ze leiden impulsen van het centrale zenuwstelsel naar de spieren','Ze leiden impulsen van de zintuigen naar de hersenen','Ze regelen de bloedsuiker','Ze vangen licht op'],answer:0,
         explanation:'Bewegingszenuwen leiden impulsen van het centrale zenuwstelsel naar de spieren, die daardoor samentrekken.'}),
-      B({topic:B4,type:'mc',question:'Wat is een reflex?',
+      B({topic:B4,type:'mc',group:'g-bio-reflex',question:'Wat is een reflex?',
         options:['Een snelle, onbewuste reactie die via het ruggenmerg verloopt','Een reactie die je eerst goed bedenkt','Een hormoon dat snel werkt','Een gewoonte die je hebt aangeleerd'],answer:0,
         explanation:'Een reflex is een snelle, onbewuste reactie. De impulsen gaan via het ruggenmerg, niet eerst via de grote hersenen.'}),
       B({topic:B4,type:'mc',question:'Waarom is het handig dat een reflex (zoals je hand wegtrekken van iets heets) via het ruggenmerg gaat en niet eerst via de grote hersenen? (inzicht)',
@@ -577,7 +589,7 @@ function seedContent(){
       B({topic:B4,type:'flash',question:'Beschrijf de weg die de impulsen afleggen bij een reflex, bijvoorbeeld als je je hand op een hete kachel legt.',
         answer:'Een zintuigcel in de huid vangt de prikkel (warmte/pijn) op en maakt impulsen. Via een gevoelszenuw gaan die naar het ruggenmerg. Daar worden ze meteen doorgegeven aan een bewegingszenuw, die de armspier laat samentrekken, zodat je je hand wegtrekt — zonder dat de grote hersenen er eerst aan te pas komen.'}),
       // ---- §5.5 Gedrag ----
-      B({topic:B5,type:'mc',question:'Wat is het verschil tussen aangeboren en aangeleerd gedrag?',
+      B({topic:B5,type:'mc',group:'g-bio-gedrag',question:'Wat is het verschil tussen aangeboren en aangeleerd gedrag?',
         options:['Aangeboren gedrag heb je vanaf je geboorte; aangeleerd gedrag leer je door ervaring','Aangeboren gedrag leer je op school; aangeleerd gedrag is een reflex','Er is geen verschil','Aangeboren gedrag verdwijnt altijd en aangeleerd gedrag niet'],answer:0,
         explanation:'Aangeboren gedrag heb je vanaf je geboorte (bijvoorbeeld reflexen). Aangeleerd gedrag ontwikkel je door ervaring en oefening.'}),
       B({topic:B5,type:'mc',question:'Welke van deze is een voorbeeld van aangeboren gedrag?',
@@ -592,13 +604,13 @@ function seedContent(){
       B({topic:B5,type:'flash',question:'Geef van elk een voorbeeld: aangeboren gedrag en aangeleerd gedrag.',
         answer:'Aangeboren gedrag: bijvoorbeeld knipperen met je ogen of een baby die zuigt. Aangeleerd gedrag: bijvoorbeeld fietsen, lezen of je veters strikken — dat moet je eerst leren.'}),
       // ---- §5.6 Regeling ----
-      B({topic:B6,type:'mc',question:'Wat is een hormoon?',
+      B({topic:B6,type:'mc',group:'g-bio-hormoon',question:'Wat is een hormoon?',
         options:['Een chemische stof die door klieren wordt gemaakt en via het bloed door het lichaam gaat','Een elektrisch signaal in een zenuw','Een zintuigcel in de huid','Een spier die heel snel reageert'],answer:0,
         explanation:'Hormonen zijn chemische stoffen die door klieren worden gemaakt en via het bloed door het lichaam worden vervoerd.'}),
       B({topic:B6,type:'mc',question:'Wat is een belangrijk verschil tussen regeling door het zenuwstelsel en regeling door hormonen?',
         options:['Het zenuwstelsel werkt heel snel en kort; hormonen werken langzamer maar langer','Hormonen werken sneller dan zenuwen','Het zenuwstelsel werkt via het bloed en hormonen via zenuwen','Er is geen verschil in snelheid'],answer:0,
         explanation:'Zenuwimpulsen werken heel snel en kort. Hormonen werken via het bloed langzamer, maar hun werking houdt langer aan.'}),
-      B({topic:B6,type:'mc',question:'Welk hormoon verlaagt het glucose-(suiker)gehalte in je bloed, en in welk orgaan wordt het gemaakt?',
+      B({topic:B6,type:'mc',group:'g-bio-insuline',question:'Welk hormoon verlaagt het glucose-(suiker)gehalte in je bloed, en in welk orgaan wordt het gemaakt?',
         options:['Insuline, gemaakt in de alvleesklier','Adrenaline, gemaakt in de hersenen','Insuline, gemaakt in de lever','Adrenaline, gemaakt in de alvleesklier'],answer:0,
         explanation:'Insuline wordt gemaakt in de alvleesklier en zorgt ervoor dat het glucosegehalte in het bloed daalt.'}),
       B({topic:B6,type:'mc',question:'Welk hormoon maakt je lichaam klaar voor actie (sneller hart, meer energie) als je schrikt of in gevaar bent?',
@@ -609,9 +621,66 @@ function seedContent(){
         explanation:'Hormonen worden via het bloed vervoerd; dat kost tijd. Daardoor begint de werking later, maar blijft het hormoon ook langer in het bloed actief.'}),
       B({topic:B6,type:'flash',question:'Noem twee klieren die hormonen maken en vertel kort wat ze regelen.',
         answer:'Bijvoorbeeld de alvleesklier (maakt insuline en regelt de bloedsuikerspiegel) en de bijnier (maakt adrenaline en maakt je klaar voor actie). Ook de hypofyse (stuurt andere klieren aan) of de schildklier zijn goede voorbeelden.'}),
+      // ---- §5.1 Waarnemen — uitbreiding ----
+      B({topic:B1,type:'mc',group:'g-bio-zintuig',question:'Hoe noem je een orgaan dat reageert op prikkels uit de omgeving?',
+        options:['Zintuig','Klier','Spier','Zenuw'],answer:0,
+        explanation:'Een zintuig (oog, oor, neus, tong, huid) vangt prikkels op uit de omgeving.'}),
+      B({topic:B1,type:'mc',group:'g-bio-prikkel',question:'Hoe heet een invloed uit de omgeving waarop je lichaam kan reageren?',
+        options:['Een prikkel','Een impuls','Een reflex','Een hormoon'],answer:0,
+        explanation:'Een prikkel is een invloed van buitenaf, zoals licht, geluid, warmte of aanraking.'}),
+      B({topic:B1,type:'mc',question:'Welke van deze is een prikkel?',
+        options:['Licht dat in je oog valt','Een impuls in een zenuw','Een samentrekkende spier','Een hormoon in je bloed'],answer:0,
+        explanation:'Een prikkel komt van buiten en wordt opgevangen door een zintuig; de impuls is pas het signaal dat dáárna door de zenuw gaat.'}),
+      B({topic:B1,type:'flash',question:'Wat is het verschil tussen een prikkel en een impuls?',
+        answer:'Een prikkel is de invloed uit de omgeving die een zintuig opvangt; een impuls is het elektrische signaal dat het zintuig daarna door de zenuw naar de hersenen stuurt.'}),
+      // ---- §5.2 Voelen, ruiken, proeven — uitbreiding ----
+      B({topic:B2,type:'mc',question:'Welke smaak hoort NIET bij de basissmaken van de tong?',
+        options:['Scherp','Zoet','Zuur','Bitter'],answer:0,
+        explanation:'De basissmaken zijn zoet, zuur, zout, bitter en umami. “Scherp/pittig” is geen smaak maar een pijn-/warmteprikkel.'}),
+      B({topic:B2,type:'mc',question:'Welk zintuig in de huid waarschuwt je voor schade, bijvoorbeeld bij een speldenprik?',
+        options:['Het pijnzintuig','Het tastzintuig','Het warmtezintuig','Het koudezintuig'],answer:0,
+        explanation:'Het pijnzintuig meldt (dreigende) beschadiging van het lichaam.'}),
+      B({topic:B2,type:'mc',question:'Hoe heet de buitenste laag van de huid?',
+        options:['De opperhuid','De lederhuid','Het onderhuids bindweefsel','De zweetklier'],answer:0,
+        explanation:'De huid bestaat van buiten naar binnen uit opperhuid, lederhuid en onderhuids bindweefsel.'}),
+      // ---- §5.3 Horen en zien — uitbreiding ----
+      B({topic:B3,type:'mc',group:'g-bio-iris',question:'Welk gekleurde deel van het oog maakt de pupil groter of kleiner?',
+        options:['Het regenboogvlies (iris)','Het netvlies','Het hoornvlies','De ooglens'],answer:0,
+        explanation:'Het regenboogvlies (iris) regelt via de pupil hoeveel licht er naar binnen valt.'}),
+      B({topic:B3,type:'mc',question:'Wat is de prikkel van het gehoorzintuig?',
+        options:['Geluid (trillingen)','Licht','Druk','Geur'],answer:0,
+        explanation:'Het gehoorzintuig in het oor reageert op geluidstrillingen.'}),
+      B({topic:B3,type:'flash',question:'Wat gebeurt er met je pupil in fel licht, en waarom?',
+        answer:'In fel licht wordt de pupil kleiner. Zo valt er minder licht naar binnen en wordt het gevoelige netvlies beschermd tegen beschadiging.'}),
+      // ---- §5.4 Zenuwstelsel — uitbreiding ----
+      B({topic:B4,type:'mc',group:'g-bio-reflex',question:'Hoe noem je een snelle, automatische reactie waar je niet over nadenkt?',
+        options:['Een reflex','Een impuls','Een prikkel','Conditionering'],answer:0,
+        explanation:'Een reflex is een snelle, onbewuste reactie, bijvoorbeeld je hand wegtrekken van iets heets.'}),
+      B({topic:B4,type:'mc',question:'Welke zenuwen vervoeren impulsen van de zintuigen naar het centrale zenuwstelsel?',
+        options:['Gevoelszenuwen','Bewegingszenuwen','Hormoonzenuwen','Reflexzenuwen'],answer:0,
+        explanation:'Gevoelszenuwen brengen impulsen van de zintuigen naar het ruggenmerg en de hersenen.'}),
+      B({topic:B4,type:'mc',question:'Welk orgaan is bij een reflex meestal de schakelplaats, in plaats van de grote hersenen?',
+        options:['Het ruggenmerg','De kleine hersenen','De hersenstam','Een zintuig'],answer:0,
+        explanation:'Bij een reflex gaat de impuls via het ruggenmerg direct naar een spier, zodat je heel snel reageert.'}),
+      // ---- §5.5 Gedrag — uitbreiding ----
+      B({topic:B5,type:'mc',group:'g-bio-gedrag',question:'Welk gedrag heb je vanaf je geboorte, zonder het te leren?',
+        options:['Aangeboren gedrag','Aangeleerd gedrag','Geconditioneerd gedrag','Ingeprent gedrag'],answer:0,
+        explanation:'Aangeboren gedrag is er vanaf de geboorte (bijv. zuigen of knipperen); aangeleerd gedrag leer je door ervaring.'}),
+      B({topic:B5,type:'mc',question:'Hoe heet het wennen aan een prikkel, zodat je er niet meer op reageert (zoals het tikken van een klok)?',
+        options:['Gewenning','Inprenting','Conditionering','Imitatie'],answer:0,
+        explanation:'Bij gewenning (habituatie) reageer je steeds minder op een prikkel die telkens terugkomt en niet belangrijk is.'}),
+      // ---- §5.6 Regeling — uitbreiding ----
+      B({topic:B6,type:'mc',group:'g-bio-hormoon',question:'Hoe noem je een stof die door een klier wordt gemaakt en via het bloed een orgaan aanstuurt?',
+        options:['Een hormoon','Een impuls','Een enzym','Een prikkel'],answer:0,
+        explanation:'Een hormoon wordt door een klier afgegeven aan het bloed en regelt processen in het lichaam.'}),
+      B({topic:B6,type:'mc',group:'g-bio-insuline',question:'Welk hormoon verlaagt je bloedsuiker en wordt gemaakt in de alvleesklier?',
+        options:['Insuline','Adrenaline','Groeihormoon','Testosteron'],answer:0,
+        explanation:'Insuline uit de alvleesklier zorgt dat glucose uit het bloed wordt opgenomen, waardoor de bloedsuiker daalt.'}),
+      B({topic:B6,type:'flash',question:'Inzicht: leg uit waarom regeling door hormonen langzamer op gang komt maar langer aanhoudt dan regeling door zenuwen.',
+        answer:'Hormonen reizen via het bloed; dat kost tijd, dus het effect begint later. Maar ze blijven ook langer in het bloed aanwezig, dus de werking houdt langer aan. Een zenuwimpuls is supersnel maar ook meteen weer voorbij.'}),
       // ---- Wiskunde · Getal & Ruimte VWO 1 (FLEX deel 2) — H8 Herleiden en machten ----
       // §8.1 Herleiden
-      W({topic:'§8.1 Herleiden',type:'mc',question:'Herleid: 3a + 5a',
+      W({topic:'§8.1 Herleiden',type:'mc',group:'g-wi-3a5a',question:'Herleid: 3a + 5a',
         options:['8a','15a','8a²','8'],answer:0,
         explanation:'3a en 5a zijn gelijksoortig (zelfde lettergedeelte a). Tel alleen de getallen op: 3 + 5 = 8, dus 8a.'}),
       W({topic:'§8.1 Herleiden',type:'mc',question:'Herleid: 7x + 2y + 3x',
@@ -629,7 +698,7 @@ function seedContent(){
       W({topic:'§8.1 Herleiden',type:'flash',question:'Leg uit wat "gelijksoortige termen" zijn en geef een voorbeeld.',
         answer:'Gelijksoortige termen hebben precies hetzelfde lettergedeelte, bijvoorbeeld 3a en 5a, of 2x² en 7x². Alleen gelijksoortige termen mag je bij elkaar optellen of van elkaar aftrekken; 3a en 5b zijn niet gelijksoortig.'}),
       // §8.2 Haakjes wegwerken
-      W({topic:'§8.2 Haakjes wegwerken',type:'mc',question:'Werk de haakjes weg: 3(x + 2)',
+      W({topic:'§8.2 Haakjes wegwerken',type:'mc',group:'g-wi-haakjes1',question:'Werk de haakjes weg: 3(x + 2)',
         options:['3x + 6','3x + 2','x + 6','5x'],answer:0,
         explanation:'Vermenigvuldig de 3 met elke term binnen de haakjes: 3 · x = 3x en 3 · 2 = 6, dus 3x + 6.'}),
       W({topic:'§8.2 Haakjes wegwerken',type:'mc',question:'Werk de haakjes weg: 4(a − 5)',
@@ -647,10 +716,10 @@ function seedContent(){
       W({topic:'§8.2 Haakjes wegwerken',type:'flash',question:'Werk de haakjes weg en herleid zo ver mogelijk: 3(2x + 4) − 2x',
         answer:'Eerst de haakjes: 3 · 2x = 6x en 3 · 4 = 12, dus 6x + 12. Daarna − 2x: 6x − 2x = 4x. Antwoord: 4x + 12.'}),
       // §8.3 Machten
-      W({topic:'§8.3 Machten',type:'mc',question:'Wat betekent 2⁴?',
+      W({topic:'§8.3 Machten',type:'mc',group:'g-wi-macht-betekenis',question:'Wat betekent 2⁴?',
         options:['2 · 2 · 2 · 2','2 · 4','4 · 4','2 + 2 + 2 + 2'],answer:0,
         explanation:'Een macht is herhaald vermenigvuldigen: 2⁴ betekent vier keer de 2 met zichzelf vermenigvuldigen, dus 2 · 2 · 2 · 2 = 16.'}),
-      W({topic:'§8.3 Machten',type:'mc',question:'Bereken 3³',
+      W({topic:'§8.3 Machten',type:'mc',group:'g-wi-33',question:'Bereken 3³',
         options:['27','9','6','12'],answer:0,
         explanation:'3³ = 3 · 3 · 3 = 27.'}),
       W({topic:'§8.3 Machten',type:'mc',question:'In de macht 5³ heet de 5 het … en de 3 de …',
@@ -674,7 +743,7 @@ function seedContent(){
       W({topic:'§8.5 Machten met letters',type:'mc',question:'Herleid: 3a · 2a',
         options:['6a²','5a²','6a','5a'],answer:0,
         explanation:'Vermenigvuldig de getallen: 3 · 2 = 6. En a · a = a². Samen: 6a².'}),
-      W({topic:'§8.5 Machten met letters',type:'mc',question:'Herleid: 4a² + 3a²',
+      W({topic:'§8.5 Machten met letters',type:'mc',group:'g-wi-a2',question:'Herleid: 4a² + 3a²',
         options:['7a²','7a⁴','12a²','7a'],answer:0,
         explanation:'4a² en 3a² zijn gelijksoortig. Tel de getallen op (4 + 3 = 7); de macht a² blijft hetzelfde, dus 7a².'}),
       W({topic:'§8.5 Machten met letters',type:'mc',question:'Welke twee zijn gelijksoortig (mag je optellen)?',
@@ -685,6 +754,59 @@ function seedContent(){
         explanation:'Bij optellen verandert de exponent niet: a² + a² = 2a². (a⁴ is een veelgemaakte fout — dat zou bij vermenigvuldigen kunnen, niet bij optellen.)'}),
       W({topic:'§8.5 Machten met letters',type:'flash',question:'Leg uit waarom je 5a² en 3a² wél bij elkaar mag optellen, maar 5a² en 3a niet.',
         answer:'5a² en 3a² zijn gelijksoortig (zelfde lettergedeelte a²), dus 5a² + 3a² = 8a². Bij 5a² en 3a is de macht van a verschillend (a² tegenover a), dus ze zijn niet gelijksoortig en kun je niet samennemen.'}),
+      // ---- §8.1 Herleiden — uitbreiding ----
+      W({topic:'§8.1 Herleiden',type:'mc',group:'g-wi-3a5a',question:'Herleid: 4a + 2a',
+        options:['6a','8a','6a²','8'],answer:0,
+        explanation:'4a en 2a zijn gelijksoortig: tel de getallen op (4 + 2 = 6), de letter blijft a → 6a.'}),
+      W({topic:'§8.1 Herleiden',type:'mc',question:'Herleid: 8x − 3x',
+        options:['5x','11x','5','5x²'],answer:0,
+        explanation:'8x − 3x: trek de getallen af (8 − 3 = 5), de letter blijft x → 5x.'}),
+      W({topic:'§8.1 Herleiden',type:'mc',question:'Herleid: 2a + 3b + 4a',
+        options:['6a + 3b','9ab','6ab','5a + 4b'],answer:0,
+        explanation:'Alleen gelijksoortige termen samennemen: 2a + 4a = 6a; de 3b blijft apart → 6a + 3b.'}),
+      // ---- §8.2 Haakjes wegwerken — uitbreiding ----
+      W({topic:'§8.2 Haakjes wegwerken',type:'mc',group:'g-wi-haakjes1',question:'Werk de haakjes weg: 2(x + 5)',
+        options:['2x + 10','2x + 5','x + 10','2x + 7'],answer:0,
+        explanation:'Vermenigvuldig alles binnen de haakjes met 2: 2·x = 2x en 2·5 = 10 → 2x + 10.'}),
+      W({topic:'§8.2 Haakjes wegwerken',type:'mc',question:'Werk de haakjes weg: 3(2a − 4)',
+        options:['6a − 12','6a − 4','5a − 12','6a + 12'],answer:0,
+        explanation:'3·2a = 6a en 3·(−4) = −12 → 6a − 12.'}),
+      W({topic:'§8.2 Haakjes wegwerken',type:'mc',question:'Werk de haakjes weg en herleid: 2(x + 3) + 3x',
+        options:['5x + 6','5x + 3','2x + 9','6x + 6'],answer:0,
+        explanation:'2(x + 3) = 2x + 6; samen met 3x: 2x + 3x = 5x → 5x + 6.'}),
+      // ---- §8.3 Machten — uitbreiding ----
+      W({topic:'§8.3 Machten',type:'mc',group:'g-wi-macht-betekenis',question:'Wat betekent 3⁴?',
+        options:['3 · 3 · 3 · 3','3 · 4','4 · 4 · 4','3 + 3 + 3 + 3'],answer:0,
+        explanation:'Een macht is herhaald vermenigvuldigen: 3⁴ = 3 · 3 · 3 · 3 = 81.'}),
+      W({topic:'§8.3 Machten',type:'mc',group:'g-wi-33',question:'Bereken 4³',
+        options:['64','12','16','81'],answer:0,
+        explanation:'4³ = 4 · 4 · 4 = 64.'}),
+      W({topic:'§8.3 Machten',type:'mc',question:'Bereken 10²',
+        options:['100','20','1000','12'],answer:0,
+        explanation:'10² = 10 · 10 = 100.'}),
+      W({topic:'§8.3 Machten',type:'mc',question:'Bereken 5² + 3 (let op de rekenvolgorde)',
+        options:['28','64','40','30'],answer:0,
+        explanation:'Eerst de macht: 5² = 25, dan optellen: 25 + 3 = 28.'}),
+      W({topic:'§8.3 Machten',type:'mc',question:'Bereken (−2)³',
+        options:['−8','8','−6','6'],answer:0,
+        explanation:'(−2)³ = (−2)·(−2)·(−2) = 4·(−2) = −8. Een oneven aantal minnen geeft een negatief getal.'}),
+      // ---- §8.5 Machten met letters — uitbreiding ----
+      W({topic:'§8.5 Machten met letters',type:'mc',group:'g-wi-a2',question:'Herleid: 5a² + 2a²',
+        options:['7a²','7a⁴','10a²','7a'],answer:0,
+        explanation:'5a² en 2a² zijn gelijksoortig: tel de getallen op (5 + 2 = 7), a² blijft → 7a².'}),
+      W({topic:'§8.5 Machten met letters',type:'mc',question:'Herleid: 2a · 4a',
+        options:['8a²','8a','6a²','8'],answer:0,
+        explanation:'Getallen vermenigvuldigen: 2·4 = 8; letters: a·a = a² → 8a².'}),
+      W({topic:'§8.5 Machten met letters',type:'mc',question:'Schrijf korter als macht: b · b · b',
+        options:['b³','3b','b · 3','b²'],answer:0,
+        explanation:'b drie keer met zichzelf vermenigvuldigd is b³.'}),
+      W({topic:'§8.5 Machten met letters',type:'mc',question:'Mag je 3a² en 5a samennemen tot één term?',
+        options:['Nee, ze zijn niet gelijksoortig','Ja, dat is 8a','Ja, dat is 8a²','Ja, dat is 8a³'],answer:0,
+        explanation:'Alleen gelijksoortige termen (zelfde letter én zelfde macht) mag je optellen. a² en a verschillen, dus het mag niet.'}),
+      W({topic:'§8.5 Machten met letters',type:'flash',question:'Inzicht: leg uit waarom 3a · 2a = 6a², maar 3a + 2a = 5a.',
+        answer:'Bij vermenigvuldigen doe je getallen én letters apart: 3·2 = 6 en a·a = a², dus 6a². Bij optellen tel je alleen de getallen op en blijft de letter (a) hetzelfde: 3a + 2a = 5a.'}),
+      W({topic:'§8.3 Machten',type:'flash',question:'Inzicht: waarom is (−3)² positief, maar (−3)³ negatief?',
+        answer:'(−3)² = (−3)·(−3) = 9: twee minnen vermenigvuldigd geven een plus. (−3)³ = 9·(−3) = −27: bij een oneven aantal minnen blijft het resultaat negatief.'}),
       // ---- Topografie (voorbeeld; vervang de kaarten via Beheer door je eigen screenshots) ----
       M({topic:'Provincies',question:'Welke plaats is met de stip aangegeven?',answer:'Utrecht',
         image:du(mapSVG(135,120,'')), imageLabeled:du(mapSVG(135,120,'Utrecht')),
@@ -985,8 +1107,18 @@ function viewSetup(){
 
 // Houdt max. één vraag per 'group' over, zodat herformuleerde varianten nooit samen in één quiz komen.
 function dedupeGroups(list){ const seen=new Set(); const out=[]; for(const q of list){ if(q&&q.group){ if(seen.has(q.group)) continue; seen.add(q.group); } out.push(q); } return out; }
+// Bepaalt de paragraaf-bron: expliciete q.bron, anders afgeleid uit het §-nummer in de topic + het boek.
+function qBron(q){
+  if(q&&q.bron) return q.bron;
+  if(!q||!q.topic) return '';
+  const m=String(q.topic).match(/§\s*[\d.]+/);
+  if(!m) return '';
+  const sb=subj(q.subjectId)||{};
+  const book = sb.id==='gs'?'Memo 1B' : sb.id==='bio'?'Biologie voor jou 1B' : sb.id==='wi'?'Getal & Ruimte VWO 1' : (sb.name||'');
+  return (book?book+' ':'')+m[0].replace(/\s+/,'');
+}
 // Toont de paragraaf-bron (waar het antwoord in het boek staat) bij de uitleg.
-function bronHtml(q){ return q&&q.bron?`<div class="expl" style="font-size:12px;opacity:.75;margin-top:6px">📖 ${esc(q.bron)}</div>`:''; }
+function bronHtml(q){ const b=qBron(q); return b?`<div class="expl" style="font-size:12px;opacity:.75;margin-top:6px">📖 ${esc(b)}</div>`:''; }
 function buildQuiz(){
   const {subjectId,topics,count}=state.setup;
   let pool=content.questions.filter(q=>q.subjectId===subjectId&&topics.includes(q.topic));
@@ -1049,7 +1181,7 @@ function viewQuiz(){
   let footer='';
   if(!state.quiz.revealed){
     footer=q.type==='mc'
-      ?`<button class="btn" data-check ${state.quiz.sel===null?'disabled':''}>Controleer</button>`
+      ?`<button class="btn" data-check ${state.quiz.sel===null?'disabled':''}>Volgende →</button>`
       :q.type==='pin'
       ?`<button class="btn" data-check-pin ${state.quiz.pin?'':'disabled'}>Controleer</button>
         <button class="btn btn-line" data-action="zoom-map" style="margin-left:8px">🔍 Groot</button>`
@@ -1183,6 +1315,49 @@ function viewHistory(){
     <p class="lead">Elke afgeronde sessie met datum, tijdsduur, score en verdiende XP.</p><div class="hist">${rows}</div>`;
 }
 
+/* ===================== Scoreverloop in tijd (grafiek) ===================== */
+const NLM=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+function weekStart(ts){ const m=new Date(ts); const off=(m.getDay()+6)%7; m.setDate(m.getDate()-off); m.setHours(0,0,0,0); return m; }
+function bucketKey(ts,grp){ const d=new Date(ts); const p=n=>String(n).padStart(2,'0');
+  if(grp==='day') return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  if(grp==='month') return d.getFullYear()+'-'+p(d.getMonth()+1);
+  const m=weekStart(ts); return 'w'+m.getFullYear()+'-'+p(m.getMonth()+1)+'-'+p(m.getDate()); }
+function bucketSortTs(ts,grp){ const d=new Date(ts);
+  if(grp==='month') return new Date(d.getFullYear(),d.getMonth(),1).getTime();
+  if(grp==='week') return weekStart(ts).getTime();
+  return new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime(); }
+function bucketLabel(ts,grp){ const d=new Date(ts); const p=n=>String(n).padStart(2,'0');
+  if(grp==='day') return p(d.getDate())+' '+NLM[d.getMonth()];
+  if(grp==='month') return NLM[d.getMonth()]+' '+String(d.getFullYear()).slice(2);
+  const m=weekStart(ts); return 'wk '+p(m.getDate())+'-'+p(m.getMonth()+1); }
+function progressChart(A){
+  const grp=state.chartGroup||'week', subjSel=state.chartSubject||'all', topSel=state.chartTopic||'all';
+  let data=(A||[]).filter(a=>a&&a.total>0);
+  if(subjSel!=='all') data=data.filter(a=>a.subjectId===subjSel);
+  if(topSel!=='all') data=data.filter(a=>(a.topics||[]).includes(topSel));
+  const map=new Map();
+  data.forEach(a=>{ const k=bucketKey(a.finishedAt,grp); const o=map.get(k)||{sum:0,n:0,t:bucketSortTs(a.finishedAt,grp)}; o.sum+=a.correct/a.total*100; o.n++; map.set(k,o); });
+  const buckets=[...map.values()].map(o=>({avg:o.sum/o.n,n:o.n,t:o.t})).sort((x,y)=>x.t-y.t);
+  const gbtn=(g,lab)=>`<button class="chk ${grp===g?'on':''}" data-chart-group="${g}">${lab}</button>`;
+  const subjOpts='<option value="all">Alle vakken</option>'+content.subjects.map(s=>`<option value="${s.id}" ${subjSel===s.id?'selected':''}>${esc(s.name)}</option>`).join('');
+  let topOpts='<option value="all">Alle onderwerpen</option>';
+  if(subjSel!=='all'){ const tops=[...new Set(content.questions.filter(q=>q.subjectId===subjSel).map(q=>q.topic))]; topOpts+=tops.map(t=>`<option value="${esc(t)}" ${topSel===t?'selected':''}>${esc(t)}</option>`).join(''); }
+  const controls=`<div class="checks" style="margin-bottom:10px">${gbtn('day','Dag')}${gbtn('week','Week')}${gbtn('month','Maand')}</div>
+    <div class="row" style="gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <select class="inp" data-chart-subject style="max-width:220px">${subjOpts}</select>
+      <select class="inp" data-chart-topic style="max-width:260px" ${subjSel==='all'?'disabled':''}>${topOpts}</select></div>`;
+  if(!buckets.length) return `${controls}<div class="subj-meta">Nog geen sessies voor deze selectie.</div>`;
+  const W=620,H=220,pl=34,pr=14,pt=14,pb=40,iw=W-pl-pr,ih=H-pt-pb,n=buckets.length;
+  const X=i=> n===1? pl+iw/2 : pl+iw*i/(n-1);
+  const Y=v=> pt+ih*(1-v/100);
+  const grid=[0,25,50,75,100].map(v=>`<line x1="${pl}" y1="${Y(v)}" x2="${W-pr}" y2="${Y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${pl-5}" y="${Y(v)+3}" text-anchor="end" font-size="10" fill="var(--muted)">${v}</text>`).join('');
+  const line=n>1?`<polyline points="${buckets.map((b,i)=>X(i)+','+Y(b.avg)).join(' ')}" fill="none" stroke="var(--primary)" stroke-width="2.5"/>`:'';
+  const dots=buckets.map((b,i)=>`<circle cx="${X(i)}" cy="${Y(b.avg)}" r="4" fill="var(--primary)"><title>${esc(bucketLabel(b.t,grp))}: ${Math.round(b.avg)}% (${b.n} sessie(s))</title></circle>`).join('');
+  const step=Math.max(1,Math.ceil(n/8));
+  const xlabs=buckets.map((b,i)=> (i%step===0||i===n-1)?`<text x="${X(i)}" y="${H-pb+16}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${esc(bucketLabel(b.t,grp))}</text>`:'').join('');
+  return `${controls}<div class="card" style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;height:auto" role="img">${grid}${line}${dots}${xlabs}</svg>
+    <div class="subj-meta" style="margin-top:6px">Gemiddelde score (%) per ${grp==='day'?'dag':grp==='week'?'week':'maand'} · ${data.length} sessie(s)</div></div>`;
+}
 function viewReport(){
   const roster=content.students||[];
   const rosterIds=new Set(roster.map(s=>s.id));
@@ -1202,7 +1377,9 @@ function viewReport(){
         <div style="text-align:right"><div class="hscore" style="color:var(--${lc(pct)})">${pct}%</div><div class="subj-meta">${a.correct}/${a.total}</div></div></div>
         <div class="review" style="margin-top:8px">${det}</div></div>`;}).join('')||'<div class="subj-meta">Nog geen sessies.</div>';
     return `<button class="ghost" data-report-back style="margin-bottom:14px">← Alle leerlingen</button>
-      <p class="h-eyebrow">${esc(lvl)}${st?'':' · verwijderde leerling'}</p><h1 class="h1">${esc(name)}</h1>${cards}`;
+      <p class="h-eyebrow">${esc(lvl)}${st?'':' · verwijderde leerling'}</p><h1 class="h1">${esc(name)}</h1>
+      <div class="section-top"><h2>Scoreverloop in tijd</h2></div>${progressChart(A)}
+      <div class="section-top" style="margin-top:18px"><h2>Sessies</h2></div>${cards}`;
   }
   const stat=id=>{ const A=attempts.filter(a=>a.studentId===id); if(!A.length) return null;
     return {n:A.length, avg:Math.round(A.reduce((s,a)=>s+a.correct/a.total*100,0)/A.length),
@@ -1220,6 +1397,8 @@ function viewReport(){
       return `<div class="hrow" style="cursor:pointer" data-report-student="${k}"><div class="hbody"><div class="hn">${esc(o.name||'Onbekend')} <span class="tag">${esc(o.level||'')}</span></div><div class="hm">${o.A.length} sessie(s) · gem. ${avg}%</div></div><div class="htime" style="color:var(--${lc(avg)})">${avg}%</div></div>`;}).join(''):'';
   return `<p class="h-eyebrow">Docent · resultaten</p><h1 class="h1">Resultaten per leerling</h1>
     <p class="lead">Klik op een leerling voor alle sessies met de gegeven antwoorden, scores en tijden. Resultaten blijven bewaard — ook na promotie naar een volgende klas of na verwijderen van een leerling.</p>
+    <div class="section-top"><h2>Scoreverloop in tijd — alle leerlingen</h2></div>${progressChart(attempts)}
+    <div class="section-top" style="margin-top:18px"><h2>Per leerling</h2></div>
     <div class="hist">${rosterRows}</div>${orphanHtml}`;
 }
 
@@ -1251,6 +1430,7 @@ function viewManage(){
     return `<div class="q-item"><div class="qq">${esc(st.name)} <span class="tag">${esc(st.level)}</span></div>
       <div class="qmeta"><span class="tag">code ${esc(st.code)}</span><span>${cnt(st.id)} sessie(s)</span>
         <button class="lnk" data-edit-student="${st.id}" style="color:var(--primary)">bewerken / promoveren</button>
+        <button class="lnk" data-reset-student="${st.id}">reset resultaten</button>
         <button class="lnk" data-del-student="${st.id}">verwijderen</button></div></div>`;
   }).join('')||`<div class="subj-meta">Nog geen leerlingen. Voeg er hieronder een toe.</div>`;
 
@@ -1415,7 +1595,7 @@ function startTimerDisplay(){ stopTimer(); timerInt=setInterval(()=>{const el=do
 function stopTimer(){ if(timerInt){clearInterval(timerInt);timerInt=null;} }
 
 /* ===================== Events ===================== */
-const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-do-update','data-remote-test','data-remote-pull'];
+const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-chart-group','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-reset-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-do-update','data-remote-test','data-remote-pull'];
 function findAction(start){ let el=start;
   while(el&&el.nodeType===1){ for(const a of ACTION_ATTRS){ if(el.hasAttribute(a)) return el; } el=el.parentElement; }
   return null; }
@@ -1447,6 +1627,7 @@ document.addEventListener('click',async(e)=>{
   if(t.dataset.nav){ stopTimer(); state.reportStudent=null; state.view=t.dataset.nav; render(); return; }
   if(t.dataset.reportStudent){ state.reportStudent=t.dataset.reportStudent; render(); return; }
   if(t.hasAttribute('data-report-back')){ state.reportStudent=null; render(); return; }
+  if(t.dataset.chartGroup){ state.chartGroup=t.dataset.chartGroup; render(); return; }
   if(t.dataset.action==='open-data'){ openDataModal(); return; }
   if(t.dataset.action==='logout'){ await logout(); render(); return; }
   if(t.dataset.action==='teacher'){ openAdminPrompt(); return; }
@@ -1543,7 +1724,10 @@ document.addEventListener('click',async(e)=>{
       closeModal(); state.view=state.mode==='admin'?'manage':'dashboard'; render();
     }catch(err){ alert('Kon de JSON niet lezen. Controleer of je geldige geëxporteerde data hebt geplakt.'); } return; }
   if(t.hasAttribute('data-reset-attempts')){ if(!confirm('Alle sessieresultaten, XP en badges wissen? Vakken, leerlingen en vragen blijven behouden.'))return;
-    attempts=[]; await sset(KEYS.attempts,attempts); closeModal(); render(); return; }
+    attempts=[]; await replaceAttempts(); closeModal(); render(); return; }
+  if(t.dataset.resetStudent){ const sid=t.dataset.resetStudent; const st=(content.students||[]).find(s=>s.id===sid);
+    if(!confirm('Resultaten van '+(st?st.name:'deze leerling')+' wissen? XP, badges en sessies van deze leerling worden gewist. De leerling zelf blijft bestaan.'))return;
+    attempts=attempts.filter(a=>a.studentId!==sid); await replaceAttempts(); render(); return; }
   if(t.hasAttribute('data-refresh-content')){
     const before=content.subjects.length+content.questions.length;
     content=migrate(content); content._v=CONTENT_VERSION; await sset(KEYS.content,content);
@@ -1568,6 +1752,8 @@ document.addEventListener('click',async(e)=>{
 document.addEventListener('change',async(e)=>{
   if(e.target.matches('[data-setup-subject]')){ state.setup.subjectId=e.target.value; state.setup.topics=null; render(); }
   if(e.target.matches('[data-setup-count]')){ state.setup.count=parseInt(e.target.value); const c=document.getElementById('cnt'); if(c)c.textContent=e.target.value; }
+  if(e.target.matches('[data-chart-subject]')){ state.chartSubject=e.target.value; state.chartTopic='all'; render(); return; }
+  if(e.target.matches('[data-chart-topic]')){ state.chartTopic=e.target.value; render(); return; }
   if(e.target.id==='qType'){ const v=e.target.value;
     const set=(id,on)=>{const el=document.getElementById(id); if(el)el.style.display=on?'block':'none';};
     set('mcFields',v==='mc'); set('flashFields',v==='flash'); set('mapFields',v==='map'); set('pinFields',v==='pin');
