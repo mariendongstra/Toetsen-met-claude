@@ -1442,6 +1442,8 @@ function viewManage(){
   const pinPrev=pinPreviewHTML(content.subjects[0]?content.subjects[0].id:'');
 
   return `<p class="h-eyebrow">Docent · beheer</p><h1 class="h1">Beheer</h1>
+    ${remoteOn()?`<div style="max-width:680px;margin-bottom:14px"><button class="btn btn-line" data-remote-pull>🔄 Vernieuw data van online</button>
+      <span class="subj-meta" style="margin-left:8px">Haalt de nieuwste leerlingen en resultaten op. Eventuele nog niet opgeslagen wijzigingen worden eerst gecontroleerd.</span></div>`:''}
     <div class="grid" style="grid-template-columns:1fr;gap:16px;max-width:680px">
 
       <div class="card"><h2 class="mh">Leerlingen</h2>
@@ -1605,8 +1607,36 @@ function startQTimer(){ clearQTimer(); const qz=state.quiz; if(!qz) return; cons
 function timeUpMC(){ const qz=state.quiz; if(!qz) return; const q=qz.qs[qz.idx];
   if(!q||q.type!=='mc'||qz.revealed) return; qz.sel=null; qz.timedOut=true; gradeCurrent(false); }
 
+/* ===================== Online data opnieuw ophalen (docent) ===================== */
+function applyRemoteData(r){ if(r&&r[KEYS.content]) content=migrate(rehydrateImages(r[KEYS.content])); attempts=(r&&r[KEYS.attempts])||[]; state.remoteFailed=false; }
+// Detecteert lokale wijzigingen die (nog) niet online staan, zodat we niet per ongeluk overschrijven.
+function pendingVsRemote(r){
+  if(state.remoteFailed) return true;
+  const localC=JSON.stringify(stripImages(content)), remoteC=JSON.stringify((r&&r[KEYS.content])||null);
+  if(localC!==remoteC) return true;
+  const rIds=new Set(((r&&r[KEYS.attempts])||[]).map(a=>a&&a.id));
+  return attempts.some(a=>a&&a.id&&!rIds.has(a.id));
+}
+async function refreshFromOnline(btn){
+  if(!remoteOn()){ alert('Online opslag is niet ingesteld.'); return; }
+  if(btn) btn.textContent='Bezig…';
+  let r; try{ r=await remoteAll(true); }
+  catch(err){ alert('Kon de online opslag niet bereiken: '+err.message); if(btn) btn.textContent='🔄 Vernieuw data van online'; return; }
+  if(pendingVsRemote(r)){ showPullModal(); return; }
+  applyRemoteData(r); closeModal(); render();
+}
+function showPullModal(){
+  document.getElementById('modal').innerHTML=`<div class="modal-bg" id="modalBg"><div class="modal pos" style="max-width:440px">
+    <button class="x" data-close-modal>×</button><div class="modal-in"><h3>Nog niet opgeslagen wijzigingen</h3>
+    <p class="subj-meta" style="margin:0 0 14px">Er zijn lokale wijzigingen die mogelijk nog niet online zijn opgeslagen. Wat wil je doen voordat de online data wordt opgehaald?</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn" data-pull-save>Eerst opslaan, daarna vernieuwen</button>
+      <button class="btn btn-line" data-pull-discard>Lokale wijzigingen verwerpen en vernieuwen</button>
+      <button class="btn btn-line" data-close-modal>Annuleren</button>
+    </div></div></div></div>`;
+}
 /* ===================== Events ===================== */
-const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-chart-group','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-reset-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-do-update','data-remote-test','data-remote-pull'];
+const ACTION_ATTRS=['data-nav','data-action','data-login','data-start-subject','data-start-topic','data-toggle-topic','data-start-quiz','data-pick','data-check','data-check-pin','data-reveal','data-grade','data-next','data-abort','data-report-student','data-report-back','data-chart-group','data-add-level','data-del-level','data-add-student','data-edit-student','data-save-student','data-cancel-edit','data-del-student','data-reset-student','data-save-admincode','data-save-maps','data-add-subject','data-del-subject','data-add-question','data-del-q','data-close-modal','data-copy','data-import','data-reset-attempts','data-refresh-content','data-do-update','data-remote-test','data-remote-pull','data-pull-save','data-pull-discard'];
 function findAction(start){ let el=start;
   while(el&&el.nodeType===1){ for(const a of ACTION_ATTRS){ if(el.hasAttribute(a)) return el; } el=el.parentElement; }
   return null; }
@@ -1755,11 +1785,13 @@ document.addEventListener('click',async(e)=>{
     try{ await remoteAll(true); state.remoteFailed=false; alert('Verbinding met de online opslag is gelukt ✓'); }
     catch(err){ state.remoteFailed=true; alert('Verbinding mislukt: '+err.message+'\n\nControleer de Bin ID en de sleutel, en of je internet hebt.'); }
     t.textContent='Test verbinding'; return; }
-  if(t.hasAttribute('data-remote-pull')){ if(!remoteOn()){alert('Online opslag is niet ingesteld.');return;}
-    t.textContent='Bezig…';
-    try{ const all=await remoteAll(true); if(all[KEYS.content]) content=migrate(all[KEYS.content]); attempts=all[KEYS.attempts]||[];
-      state.remoteFailed=false; closeModal(); render(); }
-    catch(err){ alert('Kon niet vernieuwen vanaf online: '+err.message); t.textContent='Vernieuw vanaf online'; } return; }
+  if(t.hasAttribute('data-remote-pull')){ await refreshFromOnline(t); return; }
+  if(t.hasAttribute('data-pull-save')){ state.remoteFailed=false;
+    try{ await sset(KEYS.content,content); await sset(KEYS.attempts,attempts); const r=await remoteAll(true); applyRemoteData(r); closeModal(); render(); alert('Wijzigingen opgeslagen en data vernieuwd ✓'); }
+    catch(err){ alert('Opslaan/vernieuwen mislukt: '+err.message); } return; }
+  if(t.hasAttribute('data-pull-discard')){ state.remoteFailed=false;
+    try{ const r=await remoteAll(true); applyRemoteData(r); closeModal(); render(); }
+    catch(err){ alert('Vernieuwen mislukt: '+err.message); } return; }
 });
 document.addEventListener('change',async(e)=>{
   if(e.target.matches('[data-setup-subject]')){ state.setup.subjectId=e.target.value; state.setup.topics=null; render(); }
