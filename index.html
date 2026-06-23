@@ -352,7 +352,7 @@ function storageLabel(){
 /* ===================== Voorgeladen data ===================== */
 const DEFAULT_LEVELS=['Basisschool groep 6','Basisschool groep 7','Basisschool groep 8','VWO gymnasium klas 1','VWO gymnasium klas 2'];
 // Verhoog dit nummer telkens als er nieuwe lesstof in de seed bijkomt; opgeslagen data met een lager nummer krijgt een verplichte updatemelding.
-const CONTENT_VERSION=5;
+const CONTENT_VERSION=6;
 function seedContent(){
   const S='gs', T1='§6.1 De Renaissance', T2='§6.2 Het humanisme', T3='§6.3 De ontdekkingsreizen', T4='§6.4 Einde Amerikaanse culturen';
   const Q=(o)=>Object.assign({id:'s'+(Q._n=(Q._n||0)+1), subjectId:S},o);
@@ -363,6 +363,10 @@ function seedContent(){
   const M=(o)=>Object.assign({id:'m'+(M._n=(M._n||0)+1), subjectId:'topo', type:'map'},o);
   // Wiskunde
   const W=(o)=>Object.assign({id:'w'+(W._n=(W._n||0)+1), subjectId:'wi'},o);
+  // Aardrijkskunde — buiteNLand (Noordhoff) 1 vwo FLEX ed. 5, H4 "Een wereld van verschil"
+  const AK1='§4.1 Een wereld van verschil', AK2='§4.2 Welvaart en welzijn meten', AK3='§4.3 Ongelijkheid in arme en rijke landen',
+        AK4='§4.4 Globalisering', AK5='§4.5 Waarin een klein land groot kan zijn', AK6='§4.6 Rijk aan de rand van Europa', AK7='§4.7 Verdieping & inzicht';
+  const AK=(o)=>Object.assign({id:'ak'+(AK._n=(AK._n||0)+1), subjectId:'ak'},o);
   // Biologie
   const B_S='bio', B1='§5.1 Je omgeving waarnemen', B2='§5.2 Voelen, ruiken en proeven', B3='§5.3 Horen en zien', B4='§5.4 Het zenuwstelsel', B5='§5.5 Gedrag', B6='§5.6 Regeling';
   const B=(o)=>Object.assign({id:'b'+(B._n=(B._n||0)+1), subjectId:B_S},o);
@@ -374,6 +378,7 @@ function seedContent(){
     subjects:[
       {id:S, name:'Geschiedenis', emoji:'🏛️', sub:'Memo 1B · H6 — Nieuwe ideeën, nieuwe werelden', level:'VWO gymnasium klas 1'},
       {id:'bio', name:'Biologie', emoji:'🔬', sub:'Biologie voor jou Max · 1B — Thema 5: Waarneming, gedrag en regeling', level:'VWO gymnasium klas 1'},
+      {id:'ak', name:'Aardrijkskunde', emoji:'🌍', sub:'buiteNLand · Noordhoff 1 vwo FLEX (ed. 5) — H4: Een wereld van verschil', level:'VWO gymnasium klas 1'},
       {id:'wi', name:'Wiskunde', emoji:'📐', sub:'Getal & Ruimte VWO 1 · FLEX deel 2 — H8 Herleiden en machten', level:'VWO gymnasium klas 1'},
     ],
     questions:[
@@ -806,6 +811,99 @@ function seedContent(){
         answer:'Bij vermenigvuldigen doe je getallen én letters apart: 3·2 = 6 en a·a = a², dus 6a². Bij optellen tel je alleen de getallen op en blijft de letter (a) hetzelfde: 3a + 2a = 5a.'}),
       W({topic:'§8.3 Machten',type:'flash',question:'Inzicht: waarom is (−3)² positief, maar (−3)³ negatief?',
         answer:'(−3)² = (−3)·(−3) = 9: twee minnen vermenigvuldigd geven een plus. (−3)³ = 9·(−3) = −27: bij een oneven aantal minnen blijft het resultaat negatief.'}),
+      // ====================== AARDRIJKSKUNDE — buiteNLand 1 vwo, H4 Een wereld van verschil ======================
+      // §4.1 Een wereld van verschil
+      AK({topic:AK1,type:'mc',group:'g-ak-armoede',question:'Wat geeft de armoedegrens aan?',
+        options:['Hoeveel geld je per dag minstens nodig hebt voor eten, kleding en onderdak','Hoeveel mensen er werkloos zijn','Het gemiddelde inkomen van een land','Hoeveel een land per jaar verdient'],answer:0,
+        explanation:'De armoedegrens is het bedrag dat je dagelijks minstens nodig hebt voor de basis; die hoogte verschilt per land door de prijzen.',bron:'buiteNLand 1 vwo §4.1'}),
+      AK({topic:AK1,type:'mc',group:'g-ak-armoede',question:'Onder welke lijn leef je in armoede omdat je niet genoeg hebt voor eten, kleding en een dak boven je hoofd?',
+        options:['De armoedegrens','Het BBP per hoofd','De handelsbalans','De koopkracht'],answer:0,
+        explanation:'De armoedegrens geeft het minimale dagelijkse bedrag aan dat nodig is voor de eerste levensbehoeften.',bron:'buiteNLand 1 vwo §4.1'}),
+      AK({topic:AK1,type:'mc',question:'Iemand verkoopt zonder officiële baan spulletjes op straat om wat geld te verdienen. In welke sector werkt deze persoon?',
+        options:['De informele sector (scharreleconomie)','De formele sector','De primaire sector','De overheidssector'],answer:0,
+        explanation:'Werk zonder officiële registratie heet de informele sector of scharreleconomie; vooral in ontwikkelingslanden.',bron:'buiteNLand 1 vwo §4.1'}),
+      AK({topic:AK1,type:'flash',question:'Noem twee verschillen tussen onderwijs in een rijk land en in veel ontwikkelingslanden.',
+        answer:'Bijvoorbeeld: in een rijk land goede gebouwen, boeken en digiborden en goed opgeleide docenten; in veel ontwikkelingslanden volle klassen, weinig lesmateriaal en slecht betaalde leraren.',bron:'buiteNLand 1 vwo §4.1'}),
+      // §4.2 Welvaart en welzijn meten
+      AK({topic:AK2,type:'mc',group:'g-ak-bbp',question:'Wat is het BBP per hoofd?',
+        options:['Alles wat een land per jaar verdient, gedeeld door het aantal inwoners','Het aantal mensen met een baan','Het gemiddelde aantal kinderen per gezin','De totale uitvoer van een land'],answer:0,
+        explanation:'Het bruto binnenlands product per hoofd = de totale jaaropbrengst van een land gedeeld door het inwonertal. Het zegt iets over de welvaart.',bron:'buiteNLand 1 vwo §4.2'}),
+      AK({topic:AK2,type:'mc',group:'g-ak-bbp',question:'Hoe bereken je het BBP per hoofd van een land?',
+        options:['Het totale jaarinkomen van het land delen door het aantal inwoners','Het inkomen van de rijkste inwoner','De uitvoer min de invoer','Het aantal banen keer het minimumloon'],answer:0,
+        explanation:'BBP/hoofd = totale opbrengst per jaar ÷ aantal inwoners — een maat voor de gemiddelde welvaart.',bron:'buiteNLand 1 vwo §4.2'}),
+      AK({topic:AK2,type:'mc',question:'Waarmee meet je vooral het welzijn (de levensomstandigheden) in een land?',
+        options:['De levensverwachting','Het aantal auto’s','De oppervlakte van het land','Het aantal feestdagen'],answer:0,
+        explanation:'Welzijn meet je o.a. met de levensverwachting; die hangt af van schoon drinkwater, gezondheidszorg en voeding.',bron:'buiteNLand 1 vwo §4.2'}),
+      AK({topic:AK2,type:'mc',question:'Wat geeft de alfabetiseringsgraad aan?',
+        options:['Het percentage mensen boven de 15 dat kan lezen en schrijven','Hoeveel scholen er zijn','Het gemiddelde inkomen','Hoeveel mensen werk hebben'],answer:0,
+        explanation:'De alfabetiseringsgraad toont welk deel van de volwassenen kan lezen en schrijven; in rijke landen ligt die hoger.',bron:'buiteNLand 1 vwo §4.2'}),
+      AK({topic:AK2,type:'mc',question:'In welke sector werkt een boer die graan verbouwt?',
+        options:['De primaire sector','De secundaire sector','De tertiaire sector','De informele sector'],answer:0,
+        explanation:'De primaire sector wint grondstoffen/voedsel uit de natuur (landbouw, visserij, mijnbouw).',bron:'buiteNLand 1 vwo §4.2'}),
+      AK({topic:AK2,type:'mc',question:'Iemand werkt in een fabriek en maakt van hout meubels. In welke sector werkt deze persoon?',
+        options:['De secundaire sector','De primaire sector','De tertiaire sector','De quartaire sector'],answer:0,
+        explanation:'De secundaire sector (industrie) verwerkt grondstoffen tot producten.',bron:'buiteNLand 1 vwo §4.2'}),
+      AK({topic:AK2,type:'flash',question:'Waarom zegt het BBP per hoofd niet alles over hoe goed mensen het écht hebben?',
+        answer:'Het is een gemiddelde dat de ongelijkheid verbergt, het zegt niets over welzijn (gezondheid, onderwijs, schoon water), en inkomsten uit de informele sector tellen niet mee.',bron:'buiteNLand 1 vwo §4.2'}),
+      // §4.3 Ongelijkheid in arme en rijke landen
+      AK({topic:AK3,type:'mc',group:'g-ak-soc',question:'Hoe noem je grote verschillen in welvaart tussen groepen mensen?',
+        options:['Sociale ongelijkheid','Regionale ongelijkheid','Globalisering','Koopkracht'],answer:0,
+        explanation:'Sociale ongelijkheid = verschillen in rijkdom tussen groepen mensen.',bron:'buiteNLand 1 vwo §4.3'}),
+      AK({topic:AK3,type:'mc',group:'g-ak-soc',question:'Arm en rijk zijn ongelijk verdeeld tussen verschillende bevolkingsgroepen. Hoe heet dat?',
+        options:['Sociale ongelijkheid','Regionale ongelijkheid','Welzijn','Alfabetiseringsgraad'],answer:0,
+        explanation:'Verschillen in welvaart tússen groepen mensen heet sociale ongelijkheid.',bron:'buiteNLand 1 vwo §4.3'}),
+      AK({topic:AK3,type:'mc',question:'Het verschil in rijkdom tussen gebieden of streken binnen een land noem je…',
+        options:['Regionale ongelijkheid','Sociale ongelijkheid','Globalisering','Koopkracht'],answer:0,
+        explanation:'Regionale ongelijkheid = verschillen in welvaart tussen gebieden, bijv. een rijke en een arme streek in hetzelfde land.',bron:'buiteNLand 1 vwo §4.3'}),
+      AK({topic:AK3,type:'flash',question:'Leg uit waarom kinderarbeid vaker voorkomt in arme landen dan in rijke landen.',
+        answer:'In arme landen verdienen ouders vaak te weinig om van rond te komen, waardoor kinderen moeten meewerken in plaats van naar school te gaan.',bron:'buiteNLand 1 vwo §4.3'}),
+      // §4.4 Globalisering
+      AK({topic:AK4,type:'mc',group:'g-ak-glob',question:'Wat betekent globalisering?',
+        options:['Gebieden op aarde raken steeds meer met elkaar verbonden','Landen sluiten hun grenzen','Iedereen gaat hetzelfde verdienen','Er komen steeds meer boeren'],answer:0,
+        explanation:'Globalisering: de wereld “krimpt” doordat gebieden door handel, vervoer en internet steeds sterker met elkaar verbonden raken.',bron:'buiteNLand 1 vwo §4.4'}),
+      AK({topic:AK4,type:'mc',group:'g-ak-glob',question:'“De wereld krimpt”: landen raken steeds meer met elkaar verbonden. Hoe heet dit verschijnsel?',
+        options:['Globalisering','Regionalisering','Urbanisatie','Migratie'],answer:0,
+        explanation:'Dit groeiende verband tussen gebieden op aarde heet globalisering.',bron:'buiteNLand 1 vwo §4.4'}),
+      AK({topic:AK4,type:'mc',question:'Wat is een mno (multinationale onderneming)?',
+        options:['Een groot bedrijf met vestigingen in meerdere landen','Een bedrijf zonder werknemers','Een staatsbedrijf','Een klein familiebedrijf'],answer:0,
+        explanation:'Een mno (bijv. Samsung of Philips) heeft vestigingen in verschillende landen en stuwt de globalisering.',bron:'buiteNLand 1 vwo §4.4'}),
+      AK({topic:AK4,type:'mc',question:'Wat is GEEN oorzaak van globalisering?',
+        options:['Landen sluiten hun grenzen voor handel','Steeds meer multinationale ondernemingen','Goedkoper en sneller transport (containerschepen, vliegtuigen)','Snel internet'],answer:0,
+        explanation:'Juist het ópenstellen van grenzen versterkt globalisering; grenzen sluiten doet het tegenovergestelde.',bron:'buiteNLand 1 vwo §4.4'}),
+      AK({topic:AK4,type:'mc',question:'Zet op volgorde: grondstof → … → eindproduct. Wat hoort op de puntjes?',
+        options:['Halffabricaat','Afval','Diensten','Grondstof'],answer:0,
+        explanation:'Een grondstof (bijv. hout) wordt eerst een halffabricaat (planken) en daarna een eindproduct (tafel).',bron:'buiteNLand 1 vwo §4.4'}),
+      AK({topic:AK4,type:'flash',question:'Noem twee oorzaken van globalisering.',
+        answer:'Bijvoorbeeld: meer multinationale ondernemingen, opener grenzen voor de wereldmarkt, en goedkoper/sneller vervoer en internet waardoor de afstand tussen gebieden “krimpt”.',bron:'buiteNLand 1 vwo §4.4'}),
+      // §4.5 Waarin een klein land groot kan zijn
+      AK({topic:AK5,type:'mc',question:'Waarom is Nederland economisch groot, ondanks zijn kleine oppervlakte?',
+        options:['Het heeft de grootste zeehaven van Europa en is een groot exportland','Het heeft de meeste inwoners van Europa','Het bezit de meeste grondstoffen ter wereld','Het is het grootste landbouwland ter wereld'],answer:0,
+        explanation:'Met de haven van Rotterdam (grootste van Europa) en veel export speelt Nederland een grote rol in de wereldhandel.',bron:'buiteNLand 1 vwo §4.5'}),
+      AK({topic:AK5,type:'mc',question:'Wat lees je af op de handelsbalans van een land?',
+        options:['Hoeveel goederen een land uitvoert en invoert','Hoeveel mensen er werken','Hoeveel belasting mensen betalen','Hoe oud mensen gemiddeld worden'],answer:0,
+        explanation:'De handelsbalans toont de waarde van de uitvoer (export) en invoer (import) van goederen.',bron:'buiteNLand 1 vwo §4.5'}),
+      AK({topic:AK5,type:'mc',question:'Welke haven is de grootste van Europa en heel belangrijk voor de Nederlandse economie?',
+        options:['Rotterdam','Amsterdam','Antwerpen','Hamburg'],answer:0,
+        explanation:'De haven van Rotterdam is de grootste van Europa en een belangrijke schakel in de handel.',bron:'buiteNLand 1 vwo §4.5'}),
+      // §4.6 Rijk aan de rand van Europa
+      AK({topic:AK6,type:'mc',question:'Aan welke drukbevaren zee ligt Nederland gunstig voor de handel?',
+        options:['De Noordzee','De Middellandse Zee','De Oostzee','De Zwarte Zee'],answer:0,
+        explanation:'Nederland ligt aan de Noordzee, een van de drukst bevaren zeeën ter wereld — gunstig voor handel.',bron:'buiteNLand 1 vwo §4.6'}),
+      AK({topic:AK6,type:'mc',question:'Welke delfstof heeft Nederland in grote hoeveelheid (onder andere uit Groningen)?',
+        options:['Aardgas','Steenkool','Goud','IJzererts'],answer:0,
+        explanation:'Nederland heeft weinig grondstoffen, maar wél veel aardgas (o.a. uit het Groningenveld) en een beetje olie.',bron:'buiteNLand 1 vwo §4.6'}),
+      AK({topic:AK6,type:'mc',question:'Wat is een distributieland?',
+        options:['Een land dat een belangrijke rol speelt in het doorvoeren en verdelen van goederen naar het achterland','Een land dat alles zelf maakt','Een land zonder handel','Een land met alleen landbouw'],answer:0,
+        explanation:'Nederland is een distributieland: dankzij goede havens, wegen en ligging worden hier veel goederen doorgevoerd naar het achterland.',bron:'buiteNLand 1 vwo §4.6'}),
+      AK({topic:AK6,type:'flash',question:'Noem twee redenen waarom multinationale ondernemingen zich graag in Nederland vestigen.',
+        answer:'Bijvoorbeeld: de gunstige ligging en goede bereikbaarheid, een goed opgeleide bevolking, een stabiel en betrouwbaar land, sterke gerichtheid op het buitenland en lage belastingen voor mno’s.',bron:'buiteNLand 1 vwo §4.6'}),
+      // §4.7 Verdieping & inzicht
+      AK({topic:AK7,type:'flash',question:'Inzicht: twee landen hebben een gelijk BBP per hoofd, maar toch een heel verschillend welzijn. Hoe kan dat?',
+        answer:'Welzijn hangt af van o.a. gezondheidszorg, schoon water, onderwijs en hoe eerlijk de welvaart verdeeld is. Het BBP/hoofd is een gemiddelde dat ongelijkheid verbergt, en de informele sector telt er niet in mee.',bron:'buiteNLand 1 vwo §4.7'}),
+      AK({topic:AK7,type:'flash',question:'Inzicht: noem een voordeel én een nadeel van globalisering voor een ontwikkelingsland.',
+        answer:'Voordeel: meer werk, investeringen en handel door bijvoorbeeld mno’s. Nadeel: afhankelijkheid van die bedrijven, vaak lage lonen, winst die naar het buitenland verdwijnt en meer milieubelasting.',bron:'buiteNLand 1 vwo §4.7'}),
+      AK({topic:AK7,type:'flash',question:'Inzicht: waarom dankt Nederland zijn welvaart vooral aan ligging en handel, en niet aan grondstoffen?',
+        answer:'Nederland heeft weinig grondstoffen (wel aardgas), maar een uitstekende ligging aan de Noordzee en grote rivieren, met de haven van Rotterdam en goede infrastructuur. Daardoor verdient het vooral aan handel, doorvoer en diensten.',bron:'buiteNLand 1 vwo §4.7'}),
     ]
   };
 }
