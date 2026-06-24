@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Studiequest</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN0M4QkZGIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMkUyMTlDIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTUiIGZpbGw9InVybCgjZykiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjE4IiByPSIyLjMiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9Ii41NSIvPjxwYXRoIGQ9Ik0zOCA2IEwxNyAzNSBIMjkgTDI1IDU4IEw0OCAyNyBIMzUgTDQxIDYgWiIgZmlsbD0iI0ZGQzI0QiIgc3Ryb2tlPSIjRkZGNEQ2IiBzdHJva2Utd2lkdGg9IjEuNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPgo=">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN0M4QkZGIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMkUyMTlDIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTUiIGZpbGw9InVybCgjZykiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjE4IiByPSIyLjMiIGZpbGw9IiNGRkZGRkYiIG9wYWNpdHk9Ii41NSIvPjxwYXRoIGQ9Ik0zOCA2IEwxNyAzNSBIMjkgTDI1IDU4IEw0OCAyNyBIMzUgTDQxIDYgWiIgZmlsbD0iI0ZGQzI0QiIgc3Ryb2tlPSIjRkZGNEQ2IiBzdHJva2Utd2lkdGg9IjEuNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPgo=">
 <style>
   :root{
     --bg:#0F1226; --bg2:#161A36; --paper:#1C2143; --paper2:#232A52;
@@ -1345,14 +1347,14 @@ function viewDashboard(){
 function viewSetup(){
   const subs=mySubjects();
   if(subs.length===0) return `<h1 class="h1">Geen toetsen voor jouw niveau</h1><div class="empty"><p>Je docent zet ze klaar via Beheer.</p></div>`;
-  if(!state.setup||!subs.find(s=>s.id===state.setup.subjectId)) state.setup={subjectId:subs[0].id,topics:null,count:10};
+  if(!state.setup||!subs.find(s=>s.id===state.setup.subjectId)) state.setup={subjectId:subs[0].id,topics:null,count:15};
   const sid=state.setup.subjectId, ts=topicsOf(sid);
   if(state.setup.topics===null) state.setup.topics=[...ts];
   const sOpts=subs.map(s=>`<option value="${s.id}" ${s.id===sid?'selected':''}>${esc(s.name)}</option>`).join('');
   const tChecks=ts.map(t=>`<button class="chk ${state.setup.topics.includes(t)?'on':''}" data-toggle-topic="${esc(t)}">${esc(t)}</button>`).join('')
     ||`<span class="subj-meta">Dit vak heeft nog geen onderwerpen.</span>`;
   const pool=dedupeGroups(content.questions.filter(q=>q.subjectId===sid&&state.setup.topics.includes(q.topic))).length;
-  const maxN=Math.min(pool,30), cnt=Math.min(state.setup.count,maxN)||(pool?1:0);
+  const maxN=pool, cnt=Math.min(state.setup.count,maxN)||(pool?1:0);
   return `<p class="h-eyebrow">Nieuwe quest</p><h1 class="h1">Stel je toets samen</h1>
     <div class="card" style="max-width:560px">
       <label class="fld"><span>Vak</span><select class="inp" data-setup-subject>${sOpts}</select></label>
@@ -1954,8 +1956,8 @@ document.addEventListener('click',async(e)=>{
     if(!st){ if(err) err.textContent='Naam en code kloppen niet. Vraag je docent om de juiste gegevens.'; return; }
     await loginStudent(st.id); state.view='dashboard'; render(); return; }
   if(t.hasAttribute('data-close-modal')){ closeModal(); return; }
-  if(t.dataset.startSubject){ state.setup={subjectId:t.dataset.startSubject,topics:null,count:10}; state.view='setup'; render(); return; }
-  if(t.dataset.startTopic){ const[sid,tp]=t.dataset.startTopic.split('|'); state.setup={subjectId:sid,topics:[tp],count:10}; state.view='setup'; render(); return; }
+  if(t.dataset.startSubject){ state.setup={subjectId:t.dataset.startSubject,topics:null,count:15}; state.view='setup'; render(); return; }
+  if(t.dataset.startTopic){ const[sid,tp]=t.dataset.startTopic.split('|'); state.setup={subjectId:sid,topics:[tp],count:15}; state.view='setup'; render(); return; }
   if(t.dataset.toggleTopic!==undefined){ const tp=t.dataset.toggleTopic,arr=state.setup.topics,i=arr.indexOf(tp);
     if(i>=0){if(arr.length>1)arr.splice(i,1);}else arr.push(tp); render(); return; }
   if(t.hasAttribute('data-start-quiz')){ buildQuiz(); state.view='quiz'; render(); return; }
