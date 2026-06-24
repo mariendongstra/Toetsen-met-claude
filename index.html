@@ -352,7 +352,7 @@ function storageLabel(){
 /* ===================== Voorgeladen data ===================== */
 const DEFAULT_LEVELS=['Basisschool groep 6','Basisschool groep 7','Basisschool groep 8','VWO gymnasium klas 1','VWO gymnasium klas 2'];
 // Verhoog dit nummer telkens als er nieuwe lesstof in de seed bijkomt; opgeslagen data met een lager nummer krijgt een verplichte updatemelding.
-const CONTENT_VERSION=6;
+const CONTENT_VERSION=7;
 function seedContent(){
   const S='gs', T1='§6.1 De Renaissance', T2='§6.2 Het humanisme', T3='§6.3 De ontdekkingsreizen', T4='§6.4 Einde Amerikaanse culturen';
   const Q=(o)=>Object.assign({id:'s'+(Q._n=(Q._n||0)+1), subjectId:S},o);
@@ -367,6 +367,11 @@ function seedContent(){
   const AK1='§4.1 Een wereld van verschil', AK2='§4.2 Welvaart en welzijn meten', AK3='§4.3 Ongelijkheid in arme en rijke landen',
         AK4='§4.4 Globalisering', AK5='§4.5 Waarin een klein land groot kan zijn', AK6='§4.6 Rijk aan de rand van Europa', AK7='§4.7 Verdieping & inzicht';
   const AK=(o)=>Object.assign({id:'ak'+(AK._n=(AK._n||0)+1), subjectId:'ak'},o);
+  // Nederlands — PLOT26 cursus Lezen 1 (les 1-8) & Lezen 2 (les 1-5)
+  const NT1='Lezen 1 · Tekstniveau & criteria', NT2='Lezen 1 · De leesmotor', NT3='Het tekstgeraamte', NT4='Lezen 1 · Tekstendossier',
+        NT5='Leesmanieren & leesstrategie', NT6='Lezen · Begrippen', NT7='Lezen 2 · Tekstnavigatie', NT8='Lezen 2 · Zoekend lezen',
+        NT9='Lezen 2 · Grondig lezen', NT10='Lezen 2 · Papier, pdf & online';
+  const NE=(o)=>Object.assign({id:'ne'+(NE._n=(NE._n||0)+1), subjectId:'ne'},o);
   // Biologie
   const B_S='bio', B1='§5.1 Je omgeving waarnemen', B2='§5.2 Voelen, ruiken en proeven', B3='§5.3 Horen en zien', B4='§5.4 Het zenuwstelsel', B5='§5.5 Gedrag', B6='§5.6 Regeling';
   const B=(o)=>Object.assign({id:'b'+(B._n=(B._n||0)+1), subjectId:B_S},o);
@@ -379,6 +384,7 @@ function seedContent(){
       {id:S, name:'Geschiedenis', emoji:'🏛️', sub:'Memo 1B · H6 — Nieuwe ideeën, nieuwe werelden', level:'VWO gymnasium klas 1'},
       {id:'bio', name:'Biologie', emoji:'🔬', sub:'Biologie voor jou Max · 1B — Thema 5: Waarneming, gedrag en regeling', level:'VWO gymnasium klas 1'},
       {id:'ak', name:'Aardrijkskunde', emoji:'🌍', sub:'buiteNLand · Noordhoff 1 vwo FLEX (ed. 5) — H4: Een wereld van verschil', level:'VWO gymnasium klas 1'},
+      {id:'ne', name:'Nederlands', emoji:'📖', sub:'PLOT26 · Cursus Lezen 1 & Lezen 2 (leesvaardigheid)', level:'VWO gymnasium klas 1'},
       {id:'wi', name:'Wiskunde', emoji:'📐', sub:'Getal & Ruimte VWO 1 · FLEX deel 2 — H8 Herleiden en machten', level:'VWO gymnasium klas 1'},
     ],
     questions:[
@@ -904,6 +910,139 @@ function seedContent(){
         answer:'Voordeel: meer werk, investeringen en handel door bijvoorbeeld mno’s. Nadeel: afhankelijkheid van die bedrijven, vaak lage lonen, winst die naar het buitenland verdwijnt en meer milieubelasting.',bron:'buiteNLand 1 vwo §4.7'}),
       AK({topic:AK7,type:'flash',question:'Inzicht: waarom dankt Nederland zijn welvaart vooral aan ligging en handel, en niet aan grondstoffen?',
         answer:'Nederland heeft weinig grondstoffen (wel aardgas), maar een uitstekende ligging aan de Noordzee en grote rivieren, met de haven van Rotterdam en goede infrastructuur. Daardoor verdient het vooral aan handel, doorvoer en diensten.',bron:'buiteNLand 1 vwo §4.7'}),
+      // ====================== NEDERLANDS — PLOT26 Lezen 1 & Lezen 2 (leesvaardigheid) ======================
+      // ---- Lezen 1 · Les 1: tekstniveau & criteria ----
+      NE({topic:NT1,type:'mc',group:'g-ne-criterium',question:'Wat is een criterium?',
+        options:['Datgene waarop je je beoordeling baseert','Een korte samenvatting','De titel van een tekst','Een moeilijk woord'],answer:0,
+        explanation:'Een criterium is een punt waarop je je oordeel baseert — bijvoorbeeld om te bepalen hoe moeilijk een tekst is.',bron:'PLOT26 Lezen 1 · Les 1'}),
+      NE({topic:NT1,type:'mc',group:'g-ne-criterium',question:'Je beoordeelt hoe moeilijk een tekst is. Hoe noem je zo’n maatstaf waarop je je oordeel baseert?',
+        options:['Een criterium','Een illustratie','Een leesdoel','Een woordweb'],answer:0,
+        explanation:'De maatstaf waarop je een oordeel baseert heet een criterium.',bron:'PLOT26 Lezen 1 · Les 1'}),
+      NE({topic:NT1,type:'mc',question:'Welke hoort NIET bij de criteria om het niveau van een tekst te beoordelen?',
+        options:['De naam van de schrijver','De lengte van de zinnen','Het aantal moeilijke woorden','De lay-out'],answer:0,
+        explanation:'De criteria zijn o.a. lengte van tekst en zinnen, moeilijke woorden, lay-out, afbeeldingen en onderwerp — niet de naam van de schrijver.',bron:'PLOT26 Lezen 1 · Les 1'}),
+      NE({topic:NT1,type:'flash',question:'Noem drie criteria waarmee je het niveau van een tekst kunt inschatten.',
+        answer:'Bijvoorbeeld: de lengte van de tekst, de lengte van de zinnen, het aantal moeilijke woorden, de lay-out, de afbeeldingen en het onderwerp.',bron:'PLOT26 Lezen 1 · Les 1'}),
+      // ---- Lezen 1 · Les 2-4: de leesmotor ----
+      NE({topic:NT2,type:'mc',group:'g-ne-leesmotor',question:'Wat wordt bedoeld met “de leesmotor”?',
+        options:['Hoe meer je leest, hoe meer kennis je krijgt, waardoor lezen makkelijker en leuker wordt — en je weer meer gaat lezen','Een apparaat om sneller te lezen','Een toets over lezen','Het hardop voorlezen in de klas'],answer:0,
+        explanation:'De leesmotor: woord- en voorkennis maken lezen makkelijker en leuker, je leest meer, krijgt nog meer kennis, en gaat in bijna alle vakken beter lezen.',bron:'PLOT26 Lezen 1 · Les 2'}),
+      NE({topic:NT2,type:'mc',group:'g-ne-leesmotor',question:'Hoe heet het verschijnsel dat lezen steeds makkelijker en leuker wordt naarmate je meer leest?',
+        options:['De leesmotor','Het tekstgeraamte','Het tekstendossier','De leesmanier'],answer:0,
+        explanation:'Dit “op gang komen” van het lezen door meer kennis heet de leesmotor.',bron:'PLOT26 Lezen 1 · Les 2'}),
+      NE({topic:NT2,type:'mc',question:'Wat is het verschil tussen woordkennis en voorkennis?',
+        options:['Woordkennis = hoeveel woorden je kent; voorkennis = wat je al over een onderwerp weet','Woordkennis = wat je al weet; voorkennis = hoeveel woorden je kent','Ze betekenen precies hetzelfde','Beide gaan over de lengte van zinnen'],answer:0,
+        explanation:'Woordkennis gaat over het aantal woorden dat je kent; voorkennis over wat je al weet over een onderwerp. Allebei maken lezen makkelijker.',bron:'PLOT26 Lezen 1 · Les 2'}),
+      NE({topic:NT2,type:'mc',question:'Waarin kun je je voorkennis over een onderwerp overzichtelijk opschrijven?',
+        options:['In een woordweb','In de bronvermelding','In een tabel met cijfers','In het colofon'],answer:0,
+        explanation:'Een woordweb helpt je je voorkennis op te schrijven voordat je gaat lezen.',bron:'PLOT26 Lezen 1 · Les 2'}),
+      NE({topic:NT2,type:'mc',question:'Wat is een goede manier om je voorkennis te vergroten vóór het lezen?',
+        options:['Een filmpje over het onderwerp bekijken','De tekst meteen woord voor woord lezen','De tekst overslaan','Alleen de laatste alinea lezen'],answer:0,
+        explanation:'Je voorkennis vergroot je bijvoorbeeld door in je geheugen te graven (woordweb/lijstje) of een filmpje over het onderwerp te bekijken.',bron:'PLOT26 Lezen 1 · Les 3'}),
+      NE({topic:NT2,type:'flash',question:'Inzicht: leg uit waarom iemand die veel leest, het vaak in bijna álle schoolvakken beter gaat doen.',
+        answer:'Door veel lezen groeit je woord- en voorkennis. Daardoor begrijp je teksten bij élk vak makkelijker, leer je sneller en presteer je in bijna alle vakken beter — dat is het effect van de leesmotor.',bron:'PLOT26 Lezen 1 · Les 2'}),
+      // ---- Het tekstgeraamte (Lezen 1 · Les 5 + Lezen 2 · Les 1) ----
+      NE({topic:NT3,type:'mc',group:'g-ne-geraamte',question:'Wat is het tekstgeraamte?',
+        options:['De “buitenkant” van een tekst: de onderdelen die je ziet zonder grondig te lezen','De moeilijkste alinea van een tekst','De samenvatting achteraan','De woordenlijst'],answer:0,
+        explanation:'Het tekstgeraamte is de buitenkant van een tekst (titel, kopjes, plaatjes enz.) waarmee je al veel te weten komt vóór het lezen.',bron:'PLOT26 Lezen 1 · Les 5'}),
+      NE({topic:NT3,type:'mc',group:'g-ne-geraamte',question:'Hoe noem je samen de titel, illustraties, tussenkopjes en vetgedrukte inleiding van een tekst?',
+        options:['Het tekstgeraamte','Het tekstendossier','De leesmotor','Het leesdoel'],answer:0,
+        explanation:'Die zichtbare onderdelen vormen samen het tekstgeraamte.',bron:'PLOT26 Lezen 1 · Les 5'}),
+      NE({topic:NT3,type:'mc',question:'Welke hoort NIET bij het tekstgeraamte?',
+        options:['De mening van de lezer','De titel','De tussenkopjes','De vetgedrukte inleiding'],answer:0,
+        explanation:'Tot het tekstgeraamte horen o.a. titel, illustratie, inleiding, bron, tussenkopjes, tabel en het begin/eind van alinea’s — niet de mening van de lezer.',bron:'PLOT26 Lezen 1 · Les 5'}),
+      NE({topic:NT3,type:'flash',question:'Noem vier onderdelen van het tekstgeraamte.',
+        answer:'Bijvoorbeeld: titel, illustratie, vetgedrukte inleiding, bron, tussenkopjes, tabel, het begin van de alinea en het eind van de alinea.',bron:'PLOT26 Lezen 1 · Les 5'}),
+      NE({topic:NT3,type:'flash',question:'Inzicht: waarom kun je met alleen het tekstgeraamte vaak al voorspellen waar een tekst over gaat, nog vóór je hem leest?',
+        answer:'De titel, tussenkopjes, illustraties en de vetgedrukte inleiding verraden het onderwerp en de hoofdlijn. Daardoor kun je voorspellen waar de tekst over gaat en of hij bij je past, zonder alles te lezen.',bron:'PLOT26 Lezen 1 · Les 5'}),
+      // ---- Lezen 1 · Les 6: tekstendossier ----
+      NE({topic:NT4,type:'mc',question:'Wat is het belangrijkste doel van het tekstendossier?',
+        options:['Je voortgang in lezen zichtbaar maken (zien dat je steeds moeilijkere teksten kunt lezen)','Mooie plaatjes verzamelen','Je cijfers voor alle vakken bewaren','Reclameteksten verzamelen'],answer:0,
+        explanation:'Het tekstendossier laat je voortgang zien: je merkt dat je steeds moeilijkere teksten aankunt.',bron:'PLOT26 Lezen 1 · Les 6'}),
+      NE({topic:NT4,type:'mc',question:'Welke teksten horen in je tekstendossier?',
+        options:['Teksten die je interessant vindt én op jouw niveau zijn','Alleen heel makkelijke teksten','Alleen teksten die je docent kiest','Willekeurige teksten van internet'],answer:0,
+        explanation:'Je bewaart teksten die je interessant vindt en die bij jouw niveau passen (niet te makkelijk, net niet te moeilijk).',bron:'PLOT26 Lezen 1 · Les 6'}),
+      // ---- Leesmanieren & leesstrategie (Lezen 1 · Les 7) ----
+      NE({topic:NT5,type:'mc',question:'Hoeveel leesmanieren heb je geleerd?',
+        options:['Vijf','Drie','Twee','Acht'],answer:0,
+        explanation:'De vijf leesmanieren zijn: ontspannend, zoekend, scannend, grondig en kritisch lezen.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',group:'g-ne-scannend',question:'Je kijkt snel waar een tekst over gaat en of hij interessant is. Welke leesmanier is dit?',
+        options:['Scannend lezen','Grondig lezen','Kritisch lezen','Ontspannend lezen'],answer:0,
+        explanation:'Bij scannend lezen ga je snel door de tekst om te zien waar hij over gaat en of hij de moeite waard is.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',group:'g-ne-scannend',question:'Welke leesmanier gebruik je om snel te beoordelen of een tekst interessant is om verder te lezen?',
+        options:['Scannend lezen','Kritisch lezen','Grondig lezen','Zoekend lezen'],answer:0,
+        explanation:'Scannend lezen = snel de grote lijn pakken om te beslissen of je verder leest.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',group:'g-ne-grondig',question:'Je wilt een tekst echt begrijpen en onthouden voor een toets. Hoe lees je dan?',
+        options:['Grondig lezen','Scannend lezen','Ontspannend lezen','Zoekend lezen'],answer:0,
+        explanation:'Grondig lezen is gericht op echt begrijpen en onthouden.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',group:'g-ne-grondig',question:'Welke leesmanier gebruik je als je de inhoud van een tekst volledig wilt snappen en kunnen navertellen?',
+        options:['Grondig lezen','Scannend lezen','Zoekend lezen','Ontspannend lezen'],answer:0,
+        explanation:'Wil je de tekst echt begrijpen en onthouden, dan lees je grondig.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',question:'Welke leesmanier hoort bij: “Ik wil weten of het waar is en of ik het ermee eens ben.”?',
+        options:['Kritisch lezen','Ontspannend lezen','Scannend lezen','Zoekend lezen'],answer:0,
+        explanation:'Bij kritisch lezen beoordeel je of iets klopt en of je het met de tekst eens bent.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',group:'g-ne-manier-strategie',question:'Wat is het verschil tussen een leesmanier en een leesstrategie?',
+        options:['Leesmanier = waarom je leest (je doel); leesstrategie = hoe je het aanpakt','Leesmanier = hoe je het aanpakt; leesstrategie = waarom je leest','Ze betekenen hetzelfde','Beide gaan over de lengte van de tekst'],answer:0,
+        explanation:'Leesmanier hoort bij je doel (waarom lees je?); leesstrategie bij je aanpak (welke handigheidjes gebruik je?).',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',group:'g-ne-manier-strategie',question:'“Waarom je leest” hoort bij de leesmanier. Waar hoort “hoe je het lezen aanpakt” bij?',
+        options:['Bij de leesstrategie','Bij het tekstgeraamte','Bij het leesdoel','Bij het criterium'],answer:0,
+        explanation:'De aanpak (handigheidjes) van het lezen heet de leesstrategie; het doel is de leesmanier.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',question:'Wat is een leesdoel?',
+        options:['De reden waarom je een tekst leest','De titel van de tekst','Het aantal alinea’s','De moeilijkste zin'],answer:0,
+        explanation:'Je leesdoel is de reden waarom je leest; dat bepaalt mede hoe je leest.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'mc',question:'Wat is volgens de cursus de belangrijkste strategie bij vrijwel élke tekst, vóór je begint te lezen?',
+        options:['Voorspellen waar de tekst over gaat','Meteen woord voor woord lezen','De tekst hardop voorlezen','De laatste alinea eerst lezen'],answer:0,
+        explanation:'Begin niet zomaar: voorspel eerst (met het tekstgeraamte) waar de tekst over gaat.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'flash',question:'Noem de vijf leesmanieren.',
+        answer:'Ontspannend lezen, zoekend lezen, scannend lezen, grondig lezen en kritisch lezen.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      NE({topic:NT5,type:'flash',question:'Inzicht: waarom kies je voor een stripverhaal een andere leesmanier dan voor een tekst die je voor een toets moet leren?',
+        answer:'De leesmanier hangt af van je leesdoel. Een strip lees je voor je plezier (ontspannend lezen), terwijl je toetsstof echt wilt begrijpen en onthouden (grondig lezen). Verschillend doel → verschillende leesmanier.',bron:'PLOT26 Lezen 1 · Les 7'}),
+      // ---- Begrippen ----
+      NE({topic:NT6,type:'mc',question:'Wat is een pleidooi?',
+        options:['Een toespraak waarin je anderen ergens van probeert te overtuigen','Een korte samenvatting','Een lijst met moeilijke woorden','Een soort tabel'],answer:0,
+        explanation:'Een pleidooi is een toespraak waarmee je anderen wilt overtuigen en zo iets wilt bereiken.',bron:'PLOT26 Lezen 1 · Les 8'}),
+      // ---- Lezen 2 · Les 1: tekstnavigatie / doolhof ----
+      NE({topic:NT7,type:'mc',group:'g-ne-doolhof',question:'Wat betekent “doolhof” figuurlijk?',
+        options:['Iets wat heel onoverzichtelijk is; een warboel','Een mooie tuin','Een korte tekst','Een racebaan'],answer:0,
+        explanation:'Letterlijk is een doolhof een tuin met onoverzichtelijke slingerpaden; figuurlijk betekent het: iets onoverzichtelijks, een warboel.',bron:'PLOT26 Lezen 2 · Les 1'}),
+      NE({topic:NT7,type:'mc',group:'g-ne-doolhof',question:'Een tekst zonder kopjes en structuur is net een doolhof. Wat betekent “doolhof” hier figuurlijk?',
+        options:['Iets onoverzichtelijks / een warboel','Een spannend verhaal','Een hele korte tekst','Een tekst met veel plaatjes'],answer:0,
+        explanation:'Figuurlijk staat doolhof voor iets onoverzichtelijks; het tekstgeraamte helpt je juist “de weg te vinden” in de tekst.',bron:'PLOT26 Lezen 2 · Les 1'}),
+      NE({topic:NT7,type:'mc',question:'Bij welke twee leesmanieren kun je het tekstgeraamte het best gebruiken?',
+        options:['Zoekend lezen en scannend lezen','Ontspannend lezen en kritisch lezen','Grondig lezen en ontspannend lezen','Kritisch lezen en grondig lezen'],answer:0,
+        explanation:'Het tekstgeraamte wijst je snel de weg en is daarom het handigst bij zoekend en scannend lezen.',bron:'PLOT26 Lezen 2 · Les 1'}),
+      // ---- Lezen 2 · Les 2: zoekend lezen ----
+      NE({topic:NT8,type:'mc',question:'Wat is een leesstrategie?',
+        options:['Een plan/manier waarop je het lezen aanpakt (handigheidjes)','De reden waarom je leest','De buitenkant van een tekst','Een moeilijk woord'],answer:0,
+        explanation:'Een leesstrategie is je aanpak: de handigheidjes die je gebruikt vóór, tijdens en na het lezen.',bron:'PLOT26 Lezen 2 · Les 2'}),
+      NE({topic:NT8,type:'mc',question:'Hoe vind je bij zoekend lezen snel de alinea die je nodig hebt?',
+        options:['Via de tussenkopjes','Door de hele tekst grondig te lezen','Door alleen de titel te lezen','Door de tekst hardop voor te lezen'],answer:0,
+        explanation:'Met de tussenkopjes vind je snel de juiste alinea; daarna scan je met je ogen naar het woord dat je zoekt.',bron:'PLOT26 Lezen 2 · Les 2'}),
+      NE({topic:NT8,type:'mc',question:'Wat betekent “pitstop” figuurlijk?',
+        options:['Iets kort onderbreken om iets anders tussendoor te doen','Heel hard rijden','Een tekst grondig lezen','Stoppen met lezen voor altijd'],answer:0,
+        explanation:'Letterlijk is een pitstop een stop tijdens een autorace; figuurlijk: iets kort onderbreken om iets anders te doen.',bron:'PLOT26 Lezen 2 · Les 2'}),
+      NE({topic:NT8,type:'flash',question:'Noem twee leesstrategieën voor zoekend lezen.',
+        answer:'Bijvoorbeeld: de onderdelen van het tekstgeraamte bekijken, via de tussenkopjes de juiste alinea zoeken, en met je ogen over de tekst glijden om een bepaald woord te vinden.',bron:'PLOT26 Lezen 2 · Les 2'}),
+      // ---- Lezen 2 · Les 3: grondig lezen ----
+      NE({topic:NT9,type:'mc',question:'Welke hoort bij de strategieën voor grondig lezen?',
+        options:['Na het lezen in eigen woorden samenvatten','Alleen de titel lezen','Zo snel mogelijk doorbladeren','De tekst overslaan'],answer:0,
+        explanation:'Grondig lezen gebruikt o.a.: moeilijke woorden raden, nauwkeurig stukje voor stukje lezen, vragen stellen, navertellen en samenvatten in eigen woorden.',bron:'PLOT26 Lezen 2 · Les 3'}),
+      NE({topic:NT9,type:'flash',question:'Noem drie strategieën voor grondig lezen.',
+        answer:'Bijvoorbeeld: de betekenis van moeilijke woorden raden, de tekst nauwkeurig stukje voor stukje lezen, vragen stellen bij elk stukje, in eigen woorden navertellen en na afloop samenvatten.',bron:'PLOT26 Lezen 2 · Les 3'}),
+      NE({topic:NT9,type:'flash',question:'Inzicht: waarom moet je een tekst grondig lezen om moeilijke vragen erover te kunnen beantwoorden, en niet scannend?',
+        answer:'Bij moeilijke vragen heb je echt begrip nodig. Grondig lezen is erop gericht de tekst tijdens het lezen volledig te begrijpen, terwijl scannend of zoekend lezen alleen snelle, oppervlakkige informatie geeft.',bron:'PLOT26 Lezen 2 · Les 3'}),
+      // ---- Lezen 2 · Les 4-5: papier, pdf & online ----
+      NE({topic:NT10,type:'mc',question:'Welke tekstvorm bevat meestal de meeste links en reacties van lezers?',
+        options:['De online versie','De papieren versie','De pdf-versie','Geen van alle'],answer:0,
+        explanation:'Online staan veel links en verwijzingen en vaak reacties van lezers; op papier staan geen links.',bron:'PLOT26 Lezen 2 · Les 4'}),
+      NE({topic:NT10,type:'mc',question:'Welke twee tekstvormen lijken het meest op elkaar?',
+        options:['De papieren versie en de pdf-versie','De online versie en de papieren versie','De online versie en de pdf-versie','Ze verschillen allemaal evenveel'],answer:0,
+        explanation:'De papieren versie en de pdf-versie lijken het meest op elkaar; de online versie wijkt het meest af (links, reacties).',bron:'PLOT26 Lezen 2 · Les 4'}),
+      NE({topic:NT10,type:'mc',question:'Wat heeft veel online lezen met de leesmotor te maken?',
+        options:['Je leert nieuwe woorden en krijgt meer kennis, waardoor je ook beter van papier gaat lezen','Het heeft er niets mee te maken','Je gaat juist slechter lezen','Je hoeft daardoor nooit meer van papier te lezen'],answer:0,
+        explanation:'Door veel online te lezen groeit je woord- en voorkennis (leesmotor), waardoor je ook van papier steeds beter leest.',bron:'PLOT26 Lezen 2 · Les 5'}),
+      NE({topic:NT10,type:'flash',question:'Inzicht: leg uit waarom een online tekst vaak méér informatie biedt dan dezelfde tekst op papier.',
+        answer:'In de online versie staan veel links, verwijzingen en reacties van lezers, waardoor je doorklikt naar extra informatie. Op papier ontbreken die links, dus daar is minder aanvullende informatie beschikbaar.',bron:'PLOT26 Lezen 2 · Les 4'}),
     ]
   };
 }
